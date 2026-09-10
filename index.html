@@ -1,0 +1,2359 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Inspirasi & Ekspirasi - Game Pembelajaran Pernapasan</title>
+    <script src="assets/js/lottie.min.js"></script>
+    <script src="assets/js/napas-idle-data.js"></script>
+    <script src="assets/js/inhale-control-data.js"></script>
+    <script src="assets/js/exhale-data.js"></script>
+    <script src="assets/js/O2-data.js"></script>
+    <script src="assets/js/CO2-data.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000d1a;
+            font-family: 'Nunito', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* ===== FULL BLEED BACKGROUND LAYER ===== */
+        .game-container {
+            width: 100vw;
+            height: 100vh;
+            width: 100dvw;
+            height: 100dvh;
+            position: relative;
+            overflow: hidden;
+            background: #000d1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bg-full-bleed {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-bleed {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            filter: brightness(0.9) contrast(1.05);
+        }
+        .bg-bleed.active {
+            opacity: 1;
+        }
+
+        .bg-ambient-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 252, 249, 0.04) 0%, rgba(0, 13, 26, 0.45) 75%, rgba(0, 13, 26, 0.95) 100%);
+            pointer-events: none;
+        }
+
+        /* ===== UNIFIED 16:9 RESPONSIVE GAME STAGE ===== */
+        .game-stage {
+            position: relative;
+            z-index: 2;
+            width: min(100vw, calc(100vh * (16 / 9)));
+            height: min(100vh, calc(100vw * (9 / 16)));
+            aspect-ratio: 16 / 9;
+            container-type: size;
+            container-name: stage;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 252, 249, 0.12);
+        }
+
+        /* ===== PAGE CONTAINER ===== */
+        .page {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .page.active {
+            display: flex;
+        }
+
+        .stage-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .page-centered {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ===== GLOBAL STAGE ELEMENTS: LOGO & TOP CONTROLS ===== */
+        .logo-kemendikdasmen {
+            position: absolute;
+            top: 2.8cqh;
+            left: 2.8cqw;
+            width: clamp(34px, 4.4cqw, 75px);
+            height: auto;
+            z-index: 25;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+            pointer-events: auto;
+        }
+
+        .top-controls {
+            position: absolute;
+            top: 2.8cqh;
+            right: 2.8cqw;
+            display: flex;
+            gap: 0.8cqw;
+            z-index: 25;
+            align-items: center;
+        }
+
+        .top-btn {
+            width: clamp(32px, 3.8cqw, 65px);
+            height: clamp(32px, 3.8cqw, 65px);
+            border: none;
+            cursor: pointer;
+            background: transparent;
+            padding: 0;
+            border-radius: 20%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s;
+        }
+        .top-btn:active {
+            transform: scale(0.9);
+        }
+        @media (hover: hover) {
+            .top-btn:hover {
+                transform: scale(1.1);
+                filter: drop-shadow(0 0 8px #00fcf9);
+            }
+        }
+        .top-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* ===== BOTTOM MENU GRID ===== */
+        .menu-grid {
+            position: absolute;
+            bottom: 3.2cqh;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 1.2cqw;
+            z-index: 15;
+            width: 58cqw;
+            max-width: 860px;
+        }
+        .menu-item {
+            position: relative;
+            flex: 1;
+            max-width: 14cqw;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            line-height: 0;
+        }
+        .menu-item:active {
+            transform: scale(0.95);
+        }
+        @media (hover: hover) {
+            .menu-item:hover {
+                transform: translateY(-2px) scale(1.05);
+            }
+        }
+        .menu-item .menu-bg {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+        }
+        .menu-item .menu-on { display: none; }
+        .menu-item.active .menu-off { display: none; }
+        .menu-item.active .menu-on { display: block; }
+        .menu-item.active .menu-label { color: #001228; }
+        @media (hover: hover) {
+            .menu-item:hover .menu-off { display: none; }
+            .menu-item:hover .menu-on { display: block; }
+            .menu-item:hover .menu-label { color: #001228; }
+        }
+        .menu-item.disabled, .menu-item.locked {
+            opacity: 0.35;
+            pointer-events: none;
+            cursor: default;
+            filter: grayscale(80%);
+        }
+        .menu-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #00fcf9;
+            font-family: 'Nunito', sans-serif;
+            font-size: clamp(9px, 1.15cqw, 17px);
+            font-weight: 800;
+            text-align: center;
+            pointer-events: none;
+            white-space: nowrap;
+            letter-spacing: 0.4px;
+        }
+
+        /* ===== PAGE: LANDING ===== */
+        #landing {
+            justify-content: center;
+            align-items: center;
+        }
+        .landing-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 2cqh 0;
+        }
+        .title-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1cqh;
+            margin-bottom: 2cqh;
+        }
+        .title-svg {
+            width: 44cqw;
+            max-width: 720px;
+            height: auto;
+            filter: drop-shadow(0 4px 18px rgba(0, 252, 249, 0.3));
+        }
+        .popup-carousel {
+            position: relative;
+            width: 41cqw;
+            max-width: 600px;
+            line-height: 0;
+        }
+        .popup-carousel-bg {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.7));
+        }
+        .popup-carousel-slides {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .popup-carousel-slide {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 7% 12% 6%;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .popup-carousel-slide.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .popup-carousel-slide h3 {
+            color: #00fcf9;
+            font-size: clamp(12px, 1.45cqw, 23px);
+            font-weight: 800;
+            margin-top: 2cqh;
+            margin-bottom: 1cqh;
+            text-shadow: 0 0 10px rgba(0, 252, 249, 0.5);
+            letter-spacing: 0.5px;
+        }
+        .popup-carousel-slide p {
+            color: #fff;
+            font-size: clamp(9px, 1cqw, 15px);
+            line-height: 1.55;
+            font-weight: 400;
+            max-width: 92%;
+        }
+        .popup-carousel-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1cqw;
+            margin-top: auto;
+            padding-bottom: 2cqh;
+        }
+        .popup-carousel-btn {
+            background: rgba(0, 252, 249, 0.15);
+            border: 1px solid #00fcf9;
+            color: #00fcf9;
+            font-size: clamp(8px, 0.9cqw, 13px);
+            width: clamp(16px, 1.5cqw, 24px);
+            height: clamp(16px, 1.5cqw, 24px);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+            padding: 0;
+        }
+        .popup-carousel-btn:active { transform: scale(0.9); }
+        @media (hover: hover) {
+            .popup-carousel-btn:hover { background: rgba(0, 252, 249, 0.35); }
+        }
+        .popup-carousel-btn.highlight-next {
+            animation: glowNext 1.2s infinite;
+            background: rgba(0, 252, 249, 0.3);
+        }
+        .popup-carousel-dots {
+            display: flex;
+            align-items: center;
+            gap: 0.6cqw;
+        }
+        .popup-carousel-dot {
+            width: clamp(6px, 0.6cqw, 10px);
+            height: clamp(6px, 0.6cqw, 10px);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid #00fcf9;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .popup-carousel-dot.active {
+            background: #00fcf9;
+            box-shadow: 0 0 6px #00fcf9;
+        }
+        .mulai-btn {
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s;
+            background: none;
+            border: none;
+            padding: 0;
+            margin-top: 2cqh;
+            line-height: 0;
+        }
+        .mulai-btn.locked {
+            filter: grayscale(1) brightness(0.5);
+            pointer-events: none;
+            animation: none;
+        }
+        .mulai-btn:not(.locked):active { transform: scale(0.95); }
+        @media (hover: hover) {
+            .mulai-btn:not(.locked):hover {
+                transform: scale(1.06);
+                filter: brightness(1.2) drop-shadow(0 0 14px rgba(0, 252, 249, 0.65));
+            }
+        }
+        .mulai-btn img {
+            width: clamp(85px, 10.5cqw, 165px);
+            height: auto;
+        }
+
+        /* ===== VO COUNTDOWN & SKIP (TOP BAR HUD) ===== */
+        .vo-countdown {
+            position: absolute;
+            top: 2.8cqh;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.8cqw;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            pointer-events: none;
+            background: rgba(0, 18, 40, 0.88);
+            border: 1.5px solid rgba(0, 252, 249, 0.5);
+            border-radius: 20px;
+            padding: 0.4cqh 1.2cqw;
+            box-shadow: 0 0 16px rgba(0, 252, 249, 0.25);
+            backdrop-filter: blur(4px);
+        }
+        .vo-countdown.visible {
+            opacity: 1;
+        }
+        .vo-skip {
+            pointer-events: auto;
+            background: rgba(0, 252, 249, 0.15);
+            border: 1px solid #00fcf9;
+            color: #00fcf9;
+            font-size: clamp(8px, 0.85cqw, 12px);
+            width: clamp(18px, 1.6cqw, 26px);
+            height: clamp(18px, 1.6cqw, 26px);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            padding: 0;
+            line-height: 1;
+        }
+        .vo-skip:active { transform: scale(0.9); }
+        @media (hover: hover) {
+            .vo-skip:hover { background: rgba(0, 252, 249, 0.35); box-shadow: 0 0 8px #00fcf9; }
+        }
+        .countdown-timer {
+            display: flex;
+            align-items: center;
+            gap: 0.5cqw;
+            color: #fff;
+            font-size: clamp(11px, 1.2cqw, 17px);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+        .countdown-clock {
+            width: clamp(16px, 1.5cqw, 24px);
+            height: auto;
+        }
+
+        /* ===== PAGE: PETUNJUK ===== */
+        .petunjuk-page {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding-top: 6cqh;
+            padding-bottom: 12cqh;
+        }
+        .petunjuk-card-wrap {
+            position: relative;
+            width: 82cqw;
+            max-width: 1260px;
+            line-height: 0;
+        }
+        .petunjuk-card-bg {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 8px 30px rgba(0, 0, 0, 0.7));
+        }
+        .petunjuk-card-inner {
+            position: absolute;
+            top: 8%;
+            bottom: 8%;
+            left: 5%;
+            right: 5%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            line-height: 1.4;
+            overflow: hidden;
+        }
+        .petunjuk-body-col {
+            flex: 0 0 28%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .petunjuk-human-body {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .petunjuk-human-body svg {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
+        }
+        .petunjuk-slider-col {
+            flex: 0 0 9%;
+            height: 86%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 5;
+        }
+        .slider-label-top, .slider-label-bottom {
+            color: #00fcf9;
+            font-size: clamp(8px, 0.82cqw, 13px);
+            font-weight: 800;
+            text-align: center;
+            white-space: nowrap;
+            font-family: 'Nunito', sans-serif;
+            letter-spacing: 0.3px;
+        }
+        .slider-label-top { margin-bottom: 0.6cqh; }
+        .slider-label-bottom { margin-top: 0.6cqh; }
+        .slider-track {
+            position: relative;
+            width: clamp(14px, 1.8cqw, 28px);
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .petunjuk-slider-bar {
+            height: 100%;
+            width: auto;
+            display: block;
+        }
+        .petunjuk-slider-control {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: clamp(24px, 2.7cqw, 42px);
+            height: auto;
+            pointer-events: auto;
+            cursor: grab;
+            z-index: 10;
+            transition: bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .petunjuk-slider-control:active { cursor: grabbing; }
+
+        .petunjuk-text-col {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-left: 2.5cqw;
+            padding-right: 1cqw;
+        }
+        .petunjuk-title {
+            color: #00fcf9;
+            font-size: clamp(13px, 1.45cqw, 23px);
+            font-weight: 800;
+            margin-bottom: 1.5cqh;
+            text-shadow: 0 0 8px rgba(0, 252, 249, 0.4);
+        }
+        .petunjuk-points {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .petunjuk-points li {
+            position: relative;
+            padding-left: 1.8cqw;
+            margin-bottom: 1.2cqh;
+            color: #fff;
+            font-size: clamp(9px, 1.05cqw, 15px);
+            line-height: 1.55;
+        }
+        .petunjuk-points li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.55em;
+            width: clamp(5px, 0.55cqw, 9px);
+            height: clamp(5px, 0.55cqw, 9px);
+            background: #00fcf9;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #00fcf9;
+        }
+
+        /* ===== PAGE: MATERI (INSPIRASI & EKSPIRASI) ===== */
+        .materi-page {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            height: 100%;
+            padding-top: 4.8cqh;
+        }
+        .materi-content {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 2.2cqw;
+            width: 86cqw;
+            max-width: 1300px;
+            height: 74cqh;
+            position: relative;
+        }
+        .materi-lottie-col {
+            flex: 0 0 35cqw;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .materi-lottie {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .materi-lottie svg {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
+        }
+        .materi-lottie-gas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .materi-lottie-gas svg {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
+        }
+        .materi-slider-col {
+            flex: 0 0 6cqw;
+            height: 75%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 5;
+        }
+        .materi-slider-label-top, .materi-slider-label-bottom {
+            color: #00fcf9;
+            font-size: clamp(8px, 0.82cqw, 13px);
+            font-weight: 800;
+            text-align: center;
+            white-space: nowrap;
+            font-family: 'Nunito', sans-serif;
+        }
+        .materi-slider-label-top { margin-bottom: 0.6cqh; }
+        .materi-slider-label-bottom { margin-top: 0.6cqh; }
+        .materi-slider-track {
+            position: relative;
+            width: clamp(14px, 1.8cqw, 28px);
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .materi-slider-bar {
+            height: 100%;
+            width: auto;
+            display: block;
+        }
+        .materi-slider-ctrl {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: clamp(22px, 2.5cqw, 38px);
+            height: auto;
+            bottom: 0;
+            pointer-events: auto;
+            cursor: grab;
+            z-index: 10;
+            transition: bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .materi-slider-ctrl:active { cursor: grabbing; }
+
+        .materi-card-col {
+            flex: 0 0 38cqw;
+            height: 88%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .materi-popup-wrap {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .materi-popup-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            display: block;
+            filter: drop-shadow(0 8px 30px rgba(0, 0, 0, 0.7));
+        }
+        .materi-body {
+            position: absolute;
+            top: 14%;
+            bottom: 14%;
+            left: 14%;
+            right: 12%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: justify;
+            overflow: hidden;
+            line-height: 1.5;
+        }
+        .materi-body h2 {
+            color: #00fcf9;
+            font-size: clamp(13px, 1.5cqw, 23px);
+            font-weight: 800;
+            margin-bottom: 1.5cqh;
+            text-align: center;
+            align-self: center;
+            text-shadow: 0 0 8px rgba(0, 252, 249, 0.4);
+        }
+        .materi-body p {
+            color: #fff;
+            font-size: clamp(9px, 0.95cqw, 14.5px);
+            line-height: 1.55;
+            margin-bottom: 1.2cqh;
+            width: 100%;
+        }
+        .materi-body .highlight {
+            color: #00fcf9;
+            font-weight: 700;
+            text-shadow: 0 0 6px rgba(0, 252, 249, 0.4);
+        }
+
+        /* ===== PAGE: TANTANGAN ===== */
+        .tantangan-card-inner {
+            position: absolute;
+            top: 14%;
+            bottom: 12%;
+            left: 8%;
+            right: 8%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+        }
+        .tantangan-timeline-wrap {
+            width: 92%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .tantangan-bar-container {
+            position: relative;
+            width: 100%;
+            line-height: 0;
+        }
+        .tantangan-bar-bg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .tantangan-bar-segment {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 0;
+            border-radius: 20px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .seg-inhale, .seg-exhale { background: rgba(0, 204, 68, 0.55); }
+        .seg-tahan { background: rgba(204, 0, 34, 0.55); }
+        .tantangan-bar-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: auto;
+            pointer-events: none;
+            z-index: 3;
+        }
+        .tantangan-bar-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 4%;
+            margin-top: 1.5cqh;
+        }
+        .tantangan-bar-labels span {
+            color: #fff;
+            font-size: clamp(9px, 1.05cqw, 16px);
+            font-weight: 800;
+            font-family: 'Nunito', sans-serif;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        .tantangan-center-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2cqh;
+            margin-top: 1cqh;
+        }
+        .tantangan-tahan-buttons {
+            display: flex;
+            align-items: center;
+            gap: 1.2cqw;
+        }
+        .tahan-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            line-height: 0;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .tahan-btn:active { transform: scale(0.9); }
+        @media (hover: hover) {
+            .tahan-btn:hover { transform: scale(1.15); filter: drop-shadow(0 0 6px rgba(0, 252, 249, 0.5)); }
+        }
+        .tahan-btn img {
+            width: clamp(12px, 1.4cqw, 22px);
+            height: auto;
+        }
+        .detik-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 0;
+        }
+        .detik-display {
+            width: clamp(70px, 8.5cqw, 130px);
+            height: auto;
+            display: block;
+        }
+        .detik-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #00fcf9;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: clamp(28px, 3.8cqw, 56px);
+            z-index: 2;
+            pointer-events: none;
+            line-height: 1;
+            text-shadow: 0 0 10px rgba(0, 252, 249, 0.6);
+        }
+        .tantangan-mulai-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            line-height: 0;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s;
+        }
+        .tantangan-mulai-btn.locked {
+            filter: grayscale(1) brightness(0.5);
+            pointer-events: none;
+        }
+        .tantangan-mulai-btn:not(.locked):active { transform: scale(0.95); }
+        @media (hover: hover) {
+            .tantangan-mulai-btn:not(.locked):hover {
+                transform: scale(1.08);
+                filter: brightness(1.2) drop-shadow(0 0 12px rgba(0, 252, 249, 0.6));
+            }
+        }
+        .tantangan-mulai-btn img {
+            width: clamp(80px, 9.8cqw, 150px);
+            height: auto;
+        }
+
+        /* ===== PAGE: SOAL/KUIS ===== */
+        .soal-card-inner {
+            position: absolute;
+            top: 14%;
+            bottom: 12%;
+            left: 12%;
+            right: 12%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            line-height: 1.4;
+        }
+        .soal-question-wrap {
+            width: 100%;
+            text-align: center;
+        }
+        .soal-number {
+            color: #00fcf9;
+            font-size: clamp(11px, 1.2cqw, 18px);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.8cqh;
+            letter-spacing: 1px;
+        }
+        .soal-text {
+            color: #fff;
+            font-size: clamp(12px, 1.35cqw, 20px);
+            text-align: center;
+            line-height: 1.45;
+            font-weight: 600;
+            word-wrap: break-word;
+            max-width: 95%;
+            margin: 0 auto;
+        }
+        .options-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 1.2cqw;
+            width: 100%;
+            margin-top: 1cqh;
+        }
+        .option-btn {
+            flex: 1;
+            background: rgba(0, 252, 249, 0.08);
+            border: 2px solid #00fcf9;
+            color: #fff;
+            font-family: 'Nunito', sans-serif;
+            font-size: clamp(10px, 1.05cqw, 15px);
+            font-weight: 600;
+            padding: 1.2cqh 1.2cqw;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: clamp(34px, 5.5cqh, 56px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .option-btn:active { transform: scale(0.97); }
+        @media (hover: hover) {
+            .option-btn:hover {
+                background: rgba(0, 252, 249, 0.25);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(0, 252, 249, 0.3);
+            }
+        }
+        .option-btn.correct {
+            background: #00cc44 !important;
+            border-color: #00cc44 !important;
+            color: #fff !important;
+            box-shadow: 0 0 15px rgba(0, 204, 68, 0.6) !important;
+        }
+        .option-btn.wrong {
+            background: #cc0022 !important;
+            border-color: #cc0022 !important;
+            color: #fff !important;
+            box-shadow: 0 0 15px rgba(204, 0, 34, 0.6) !important;
+        }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+        .soal-nav {
+            display: flex;
+            gap: 1.5cqw;
+            justify-content: center;
+            margin-top: 1cqh;
+        }
+        .btn-soal-nav {
+            padding: 0.8cqh 2.2cqw;
+            border: 2px solid #00fcf9;
+            background: rgba(0, 252, 249, 0.1);
+            color: #00fcf9;
+            font-family: 'Nunito', sans-serif;
+            font-size: clamp(11px, 1.15cqw, 17px);
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .btn-soal-nav:active { transform: scale(0.95); }
+        @media (hover: hover) {
+            .btn-soal-nav:hover {
+                background: #00fcf9;
+                color: #001228;
+                box-shadow: 0 0 12px rgba(0, 252, 249, 0.5);
+            }
+        }
+        .btn-soal-nav:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        /* ===== PAGE: RESULT ===== */
+        .result-card-wrap {
+            position: relative;
+            width: 55cqw;
+            max-width: 850px;
+            line-height: 0;
+        }
+        .result-card-inner {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10%;
+            line-height: 1.4;
+            text-align: center;
+        }
+        .result-card-inner h1 {
+            color: #00fcf9;
+            font-size: clamp(18px, 2.3cqw, 36px);
+            font-weight: 800;
+            margin-bottom: 2cqh;
+            text-shadow: 0 0 15px rgba(0, 252, 249, 0.5);
+        }
+        .result-card-inner .final-score {
+            color: #fff;
+            font-size: clamp(15px, 1.7cqw, 26px);
+            font-weight: 600;
+            margin-bottom: 3cqh;
+        }
+        .result-card-inner .final-score span {
+            color: #00fcf9;
+            font-size: clamp(20px, 2.6cqw, 42px);
+            font-weight: 800;
+        }
+        .result-buttons {
+            display: flex;
+            gap: 1.5cqw;
+            justify-content: center;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes sliderGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 4px #00fcf9) drop-shadow(0 0 8px #00fcf9);
+                transform: translateX(-50%) scale(1);
+            }
+            50% {
+                filter: drop-shadow(0 0 12px #00fcf9) drop-shadow(0 0 24px #00fcf9);
+                transform: translateX(-50%) scale(1.08);
+            }
+        }
+        @keyframes glowNext {
+            0%, 100% { box-shadow: 0 0 4px #00fcf9, 0 0 8px #00fcf9; }
+            50% { box-shadow: 0 0 8px #00fcf9, 0 0 16px #00fcf9, 0 0 24px #00fcf9; }
+        }
+        .fade-in { animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .petunjuk-slider-control.highlight,
+        .materi-slider-ctrl.highlight {
+            animation: sliderGlow 3s ease-in-out infinite;
+        }
+        .petunjuk-slider-control.highlight-ready,
+        .materi-slider-ctrl.highlight-ready {
+            animation: none;
+            filter: none;
+            transform: translateX(-50%) scale(1);
+            transition: all 0.3s;
+        }
+
+        /* ===== SAFE AREA & MOBILE ORIENTATION HINT ===== */
+        @supports(padding: max(0px)) {
+            .logo-kemendikdasmen { left: max(2.8cqw, env(safe-area-inset-left)); }
+            .top-controls { right: max(2.8cqw, env(safe-area-inset-right)); }
+        }
+
+        .orientation-hint {
+            display: none;
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 18, 40, 0.9);
+            border: 1px solid #00fcf9;
+            color: #00fcf9;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            z-index: 1000;
+            pointer-events: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            white-space: nowrap;
+        }
+        @media (orientation: portrait) and (max-width: 768px) {
+            .orientation-hint {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- AMBIENT FULL-BLEED BACKGROUND -->
+        <div class="bg-full-bleed">
+            <img src="assets/images/BG_awal.svg" class="bg-bleed bg-bleed-landing active" id="bleedLanding" alt="">
+            <img src="assets/images/BG_main.svg" class="bg-bleed bg-bleed-main" id="bleedMain" alt="">
+            <div class="bg-ambient-overlay"></div>
+        </div>
+
+        <!-- UNIFIED 16:9 RESPONSIVE GAME STAGE -->
+        <div class="game-stage" id="gameStage">
+            <img src="assets/images/Logo-Kemendikdasmen.svg" class="logo-kemendikdasmen" alt="Kemendikdasmen">
+            <div class="top-controls">
+                <button class="top-btn" id="musicToggle" onclick="toggleMusic()" title="Music">
+                    <img id="musicIcon" src="assets/images/music_on.svg" alt="Music">
+                </button>
+                <button class="top-btn" id="fullscreenToggle" onclick="toggleFullscreen()" title="Fullscreen">
+                    <img src="assets/images/fullscreen.svg" alt="Fullscreen">
+                </button>
+            </div>
+
+            <!-- LANDING PAGE -->
+            <div class="page active" id="landing">
+                <img src="assets/images/BG_awal.svg" class="stage-bg" alt="">
+                <div class="landing-content">
+                    <div class="title-container">
+                        <img src="assets/images/judul.svg" class="title-svg" alt="Inspirasi &amp; Ekspirasi">
+                    </div>
+                    <div class="popup-carousel">
+                        <img src="assets/images/popup_large.svg" class="popup-carousel-bg" alt="">
+                        <div class="popup-carousel-slides">
+                            <div class="popup-carousel-slide active">
+                                <h3>Tujuan Pembelajaran</h3>
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                                <div class="popup-carousel-nav">
+                                    <button class="popup-carousel-btn popup-carousel-prev" onclick="popupCarouselPrev()">&#10094;</button>
+                                    <span class="popup-carousel-dots"><span class="popup-carousel-dot active" onclick="popupCarouselGoTo(0)"></span><span class="popup-carousel-dot" onclick="popupCarouselGoTo(1)"></span></span>
+                                    <button class="popup-carousel-btn popup-carousel-next" onclick="popupCarouselNext()">&#10095;</button>
+                                </div>
+                            </div>
+                            <div class="popup-carousel-slide">
+                                <h3>Misi</h3>
+                                <p>Kendalikan kerja sistem pernapasan Banu untuk memahami perbedaan menarik dan menghembuskan napas!</p>
+                                <div class="popup-carousel-nav">
+                                    <button class="popup-carousel-btn popup-carousel-prev" onclick="popupCarouselPrev()">&#10094;</button>
+                                    <span class="popup-carousel-dots"><span class="popup-carousel-dot active" onclick="popupCarouselGoTo(0)"></span><span class="popup-carousel-dot" onclick="popupCarouselGoTo(1)"></span></span>
+                                    <button class="popup-carousel-btn popup-carousel-next" onclick="popupCarouselNext()">&#10095;</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="mulai-btn locked" id="mulaiBtn" onclick="goToPage('petunjuk')">
+                        <img src="assets/images/mulai.svg" class="mulai-img" alt="Mulai">
+                    </button>
+                </div>
+            </div>
+
+            <!-- VO COUNTDOWN -->
+            <div class="vo-countdown" id="voCountdown">
+                <button class="vo-skip" id="voSkip" onclick="skipVoPembukaan()">&#10005;</button>
+                <div class="countdown-timer">
+                    <svg class="countdown-clock" viewBox="0 0 40 40"><circle cx="20" cy="22" r="16" fill="none" stroke="#00fcf9" stroke-width="2"/><line x1="20" y1="22" x2="20" y2="12" stroke="#00fcf9" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="22" x2="27" y2="22" stroke="#00fcf9" stroke-width="2" stroke-linecap="round"/><rect x="16" y="4" width="8" height="4" rx="1" fill="#00fcf9"/></svg>
+                    <span id="countdownNumber">0</span>
+                </div>
+            </div>
+
+            <!-- PETUNJUK PAGE -->
+            <div class="page" id="petunjuk">
+                <img src="assets/images/BG_main.svg" class="stage-bg" alt="">
+                <div class="petunjuk-page">
+                    <div class="petunjuk-card-wrap fade-in">
+                        <img src="assets/images/popup_large.svg" class="petunjuk-card-bg" alt="">
+                        <div class="petunjuk-card-inner">
+                            <div class="petunjuk-body-col">
+                                <div class="petunjuk-human-body" id="lottie-petunjuk-body"></div>
+                            </div>
+                            <div class="petunjuk-slider-col">
+                                <span class="slider-label-top">Tarik Nafas</span>
+                                <div class="slider-track" id="petunjukSliderTrack">
+                                    <img src="assets/images/slider_bar.svg" class="petunjuk-slider-bar" alt="">
+                                    <img src="assets/images/slider_control.svg" class="petunjuk-slider-control" id="sliderControl" alt="">
+                                </div>
+                                <span class="slider-label-bottom">Hembus Nafas</span>
+                            </div>
+                            <div class="petunjuk-text-col">
+                                <h2 class="petunjuk-title">Petunjuk Penggunaan:</h2>
+                                <ul class="petunjuk-points">
+                                    <li>Coba geser slider untuk melihat langsung bagaimana paru-paru dan diafragma bergerak saat udara masuk dan keluar!</li>
+                                    <li>Kamu bisa bebas mengklik tombol Inspirasi, atau Ekspirasi di layar kapan saja untuk membaca penjelasannya.</li>
+                                    <li>Klik tombol tantangan untuk berpindah ke adegan seru dan cari tahu seberapa kuat kamu bisa menahan napas!</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MENU GRID -->
+                    <div class="menu-grid" id="menuGridPetunjuk">
+                        <div class="menu-item locked" onclick="playSound('click'); goToPage('inspirasi')" data-menu="inspirasi">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Inspirasi</span>
+                        </div>
+                        <div class="menu-item locked" onclick="playSound('click'); goToPage('ekspirasi')" data-menu="ekspirasi">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Ekspirasi</span>
+                        </div>
+                        <div class="menu-item locked" onclick="playSound('click'); goToPage('tantangan')" data-menu="tantangan">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Tantangan</span>
+                        </div>
+                        <div class="menu-item locked" onclick="playSound('click'); goToPage('soal')" data-menu="soal">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Soal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INSPIRASI PAGE -->
+            <div class="page" id="inspirasi">
+                <img src="assets/images/BG_main.svg" class="stage-bg" alt="">
+                <div class="materi-page">
+                    <div class="materi-content fade-in">
+                        <div class="materi-lottie-col">
+                            <div class="materi-lottie" id="materiLottieInspirasi">
+                                <div class="materi-lottie-gas" id="materiLottieO2"></div>
+                            </div>
+                        </div>
+                        <div class="materi-slider-col">
+                            <span class="materi-slider-label-top">Tarik Nafas</span>
+                            <div class="materi-slider-track">
+                                <img src="assets/images/slider_bar.svg" class="materi-slider-bar" alt="">
+                                <img src="assets/images/slider_control.svg" class="materi-slider-ctrl" alt="">
+                            </div>
+                            <span class="materi-slider-label-bottom">Hembus Nafas</span>
+                        </div>
+                        <div class="materi-card-col">
+                            <div class="materi-popup-wrap">
+                                <img src="assets/images/popup_desc.svg" class="materi-popup-bg" alt="">
+                                <div class="materi-body">
+                                    <h2>Inspirasi</h2>
+                                    <p>Inspirasi adalah proses masuknya udara ke dalam paru-paru melalui saluran napas. Saat kita menarik napas, diafragma berkontraksi dan bergerak ke bawah, sehingga rongga dada membesar.</p>
+                                    <p>Udara yang kaya akan <span class="highlight">oksigen (O2)</span> masuk melalui hidung atau mulut, melewati tenggorokan, dan akhirnya sampai ke alveoli (kantung udara) di dalam paru-paru.</p>
+                                    <p>Proses ini sangat penting untuk menyuplai oksigen ke seluruh tubuh kita.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-grid">
+                        <div class="menu-item" onclick="playSound('click'); goToPage('inspirasi')" data-menu="inspirasi">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Inspirasi</span>
+                        </div>
+                        <div class="menu-item" onclick="playSound('click'); goToPage('ekspirasi')" data-menu="ekspirasi">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Ekspirasi</span>
+                        </div>
+                        <div class="menu-item locked" onclick="playSound('click'); goToPage('tantangan')" data-menu="tantangan">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Tantangan</span>
+                        </div>
+                        <div class="menu-item locked" onclick="playSound('click'); goToPage('soal')" data-menu="soal">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Soal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EKSPIRASI PAGE -->
+            <div class="page" id="ekspirasi">
+                <img src="assets/images/BG_main.svg" class="stage-bg" alt="">
+                <div class="materi-page">
+                    <div class="materi-content fade-in">
+                        <div class="materi-lottie-col">
+                            <div class="materi-lottie" id="materiLottieEkspirasi">
+                                <div class="materi-lottie-gas" id="materiLottieCO2"></div>
+                            </div>
+                        </div>
+                        <div class="materi-slider-col">
+                            <span class="materi-slider-label-top">Tarik Nafas</span>
+                            <div class="materi-slider-track">
+                                <img src="assets/images/slider_bar.svg" class="materi-slider-bar" alt="">
+                                <img src="assets/images/slider_control.svg" class="materi-slider-ctrl" alt="">
+                            </div>
+                            <span class="materi-slider-label-bottom">Hembus Nafas</span>
+                        </div>
+                        <div class="materi-card-col">
+                            <div class="materi-popup-wrap">
+                                <img src="assets/images/popup_desc.svg" class="materi-popup-bg" alt="">
+                                <div class="materi-body">
+                                    <h2>Ekspirasi</h2>
+                                    <p>Ekspirasi adalah proses pengeluaran udara dari paru-paru melalui saluran napas. Saat kita menghembuskan napas, diafragma berelaksasi dan bergerak ke atas.</p>
+                                    <p>Udara yang mengandung karbon dioksida (<span class="highlight">CO2</span>) dikeluarkan dari alveoli, melewati saluran napas, dan keluar melalui hidung atau mulut.</p>
+                                    <p>Proses ini sangat penting untuk membuang zat sisa metabolisme dari tubuh kita.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-grid">
+                        <div class="menu-item" onclick="playSound('click'); goToPage('inspirasi')" data-menu="inspirasi">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Inspirasi</span>
+                        </div>
+                        <div class="menu-item" onclick="playSound('click'); goToPage('ekspirasi')" data-menu="ekspirasi">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Ekspirasi</span>
+                        </div>
+                        <div class="menu-item locked" onclick="playSound('click'); goToPage('tantangan')" data-menu="tantangan">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Tantangan</span>
+                        </div>
+                        <div class="menu-item locked" onclick="playSound('click'); goToPage('soal')" data-menu="soal">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Soal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TANTANGAN PAGE -->
+            <div class="page" id="tantangan">
+                <img src="assets/images/BG_main.svg" class="stage-bg" alt="">
+                <div class="petunjuk-page">
+                    <div class="petunjuk-card-wrap fade-in">
+                        <img src="assets/images/popup_large.svg" class="petunjuk-card-bg" alt="">
+                        <div class="tantangan-card-inner">
+                            <div class="tantangan-timeline-wrap">
+                                <div class="tantangan-bar-container">
+                                    <div class="tantangan-bar-segment seg-inhale" id="segInhale"></div>
+                                    <div class="tantangan-bar-segment seg-tahan" id="segTahan"></div>
+                                    <div class="tantangan-bar-segment seg-exhale" id="segExhale"></div>
+                                    <img src="assets/images/tantangan_bar.svg" class="tantangan-bar-bg" alt="">
+                                    <img src="assets/images/tantangan_progres.svg" class="tantangan-bar-progress" id="tantanganBarProgress" alt="">
+                                </div>
+                                <div class="tantangan-bar-labels">
+                                    <span>TARIK NAPAS</span>
+                                    <span>TAHAN NAPAS</span>
+                                    <span>HEMBUS NAPAS</span>
+                                </div>
+                            </div>
+                            <div class="tantangan-center-controls">
+                                <div class="tantangan-tahan-buttons">
+                                    <button class="tahan-btn" id="btnKurangDetik" onclick="kurangTahan()"><img src="assets/images/kurang-detik.svg" alt="-"></button>
+                                    <div class="detik-wrap">
+                                        <img src="assets/images/detik.svg" class="detik-display" id="detikDisplay" alt="">
+                                        <span class="detik-value" id="detikValue">5</span>
+                                    </div>
+                                    <button class="tahan-btn" id="btnTambahDetik" onclick="tambahTahan()"><img src="assets/images/tambah-detik.svg" alt="+"></button>
+                                </div>
+                                <button class="tantangan-mulai-btn" id="tantanganMulaiBtn" onclick="startChallenge()">
+                                    <img src="assets/images/mulai.svg" alt="Mulai">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MENU GRID -->
+                    <div class="menu-grid">
+                        <div class="menu-item" onclick="playSound('click'); goToPage('inspirasi')" data-menu="inspirasi">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Inspirasi</span>
+                        </div>
+                        <div class="menu-item" onclick="playSound('click'); goToPage('ekspirasi')" data-menu="ekspirasi">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Ekspirasi</span>
+                        </div>
+                        <div class="menu-item" onclick="playSound('click'); goToPage('tantangan')" data-menu="tantangan">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Tantangan</span>
+                        </div>
+                        <div class="menu-item locked" onclick="playSound('click'); goToPage('soal')" data-menu="soal">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Soal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SOAL PAGE -->
+            <div class="page" id="soal">
+                <img src="assets/images/BG_main.svg" class="stage-bg" alt="">
+                <div class="page-centered">
+                    <div class="petunjuk-card-wrap fade-in">
+                        <img src="assets/images/popup_large.svg" class="petunjuk-card-bg" alt="">
+                        <div class="soal-card-inner">
+                            <div class="soal-question-wrap">
+                                <p class="soal-text" id="soalText"></p>
+                            </div>
+                            <div class="options-container" id="optionsContainer"></div>
+                            <div class="soal-nav">
+                                <button class="btn-soal-nav" id="btnPrevSoal" onclick="prevSoal()">Sebelumnya</button>
+                                <button class="btn-soal-nav" id="btnNextSoal" onclick="nextSoal()">Selanjutnya</button>
+                                <button class="btn-soal-nav" id="btnFinish" style="display:none" onclick="showResult()">Selesai</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULT PAGE -->
+            <div class="page" id="result">
+                <img src="assets/images/BG_main.svg" class="stage-bg" alt="">
+                <div class="page-centered">
+                    <div class="result-card-wrap fade-in">
+                        <img src="assets/images/popup_large.svg" class="petunjuk-card-bg" alt="">
+                        <div class="result-card-inner">
+                            <h1>Permainan Selesai!</h1>
+                            <p class="final-score">Skor Akhir: <span id="finalScore">0</span></p>
+                            <div class="result-buttons">
+                                <button class="mulai-btn" onclick="resetGame()">
+                                    <img src="assets/images/ulangi.svg" alt="Ulangi" style="width: clamp(90px, 11cqw, 170px);">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="orientation-hint">
+            <span>🔄 Putar ke mode lanskap untuk pengalaman terbaik</span>
+        </div>
+    </div>
+
+    <script>
+    // ============ AUDIO SYSTEM ============
+    const audioFiles = {
+        music: 'assets/audio/Main_Music.mp3',
+        click: 'assets/audio/cursor_click_01.wav',
+        move: 'assets/audio/move_cursor_11.wav',
+        correct: 'assets/audio/correct.mp3',
+        wrong: 'assets/audio/wrong.mp3',
+        peluitStart: 'assets/audio/peluit_start.wav',
+        peluitFinish: 'assets/audio/peluit_finish.wav',
+        winning: 'assets/audio/Winning.mp3',
+        vo_pembukaan: 'assets/audio/vo_pembukaan.mp3',
+        vo_petunjuk: 'assets/audio/vo_petunjuk.mp3',
+        vo_inspirasi: 'assets/audio/vo_inspirasi.mp3',
+        vo_ekspirasi: 'assets/audio/vo_ekspirasi.mp3',
+        vo_tantangan: 'assets/audio/vo_tantangan.mp3',
+        vo_refleksi: 'assets/audio/vo_refleksi.mp3',
+        vo_benar: ['assets/audio/vo_benar_1.mp3','assets/audio/vo_benar_2.mp3','assets/audio/vo_benar_3.mp3','assets/audio/vo_benar_4.mp3'],
+        vo_benar_1: 'assets/audio/vo_benar_1.mp3',
+        vo_benar_2: 'assets/audio/vo_benar_2.mp3',
+        vo_benar_3: 'assets/audio/vo_benar_3.mp3',
+        vo_benar_4: 'assets/audio/vo_benar_4.mp3'
+    };
+
+    let musicEnabled = true;
+    let musicAudio = null;
+    let currentVoice = null;
+    let masterVolume = 0.7;
+
+    function getAudio(src, vol) {
+        const a = new Audio(src);
+        a.volume = (vol !== undefined ? vol : masterVolume);
+        return a;
+    }
+
+    function playSound(name) {
+        if (name === 'click' || name === 'move') {
+            const s = getAudio(audioFiles[name], 0.5);
+            s.play().catch(()=>{});
+            return;
+        }
+        if (name === 'correct') {
+            const s = getAudio(audioFiles.correct, 0.6);
+            s.play().catch(()=>{});
+            return;
+        }
+        if (name === 'wrong') {
+            const s = getAudio(audioFiles.wrong, 0.6);
+            s.play().catch(()=>{});
+            return;
+        }
+        if (name === 'winning') {
+            const s = getAudio(audioFiles.winning, 0.7);
+            s.play().catch(()=>{});
+            return;
+        }
+        if (name.startsWith('vo_')) {
+            if (currentVoice) { currentVoice.pause(); currentVoice.currentTime = 0; restoreMusicVol(); }
+            if (name === 'vo_benar') {
+                const arr = audioFiles.vo_benar;
+                currentVoice = getAudio(arr[Math.floor(Math.random() * arr.length)]);
+            } else if (audioFiles[name]) {
+                currentVoice = getAudio(audioFiles[name]);
+            }
+            if (currentVoice) {
+                dimMusicVol();
+                currentVoice.addEventListener('ended', function() { restoreMusicVol(); flushVoEnded(); }, { once: true });
+                currentVoice.play().catch(function(){ flushVoEnded(); });
+            }
+        }
+    }
+
+    function startMusic() {
+        if (!musicAudio) {
+            musicAudio = getAudio(audioFiles.music, 0.07);
+            musicAudio.loop = true;
+        }
+        if (musicEnabled) musicAudio.play().catch(()=>{});
+    }
+
+    function dimMusicVol() {
+        if (musicAudio) musicAudio.volume = 0.02;
+    }
+
+    function restoreMusicVol() {
+        if (musicAudio && musicEnabled) musicAudio.volume = 0.07;
+    }
+
+    function toggleMusic() {
+        musicEnabled = !musicEnabled;
+        const icon = document.getElementById('musicIcon');
+        if (musicEnabled) {
+            icon.src = 'assets/images/music_on.svg';
+            if (musicAudio) musicAudio.play().catch(()=>{});
+        } else {
+            icon.src = 'assets/images/music_off.svg';
+            if (musicAudio) musicAudio.pause();
+        }
+    }
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(()=>{});
+        } else {
+            document.exitFullscreen().catch(()=>{});
+        }
+    }
+
+    // ============ POPUP CAROUSEL ============
+    let popupCarouselIndex = 0;
+    function popupCarouselGoTo(i) {
+        const slides = document.querySelectorAll('.popup-carousel-slide');
+        const total = slides.length;
+        if (!total) return;
+        slides[popupCarouselIndex].classList.remove('active');
+        document.querySelectorAll('.popup-carousel-dot').forEach(d => d.classList.remove('active'));
+        popupCarouselIndex = ((i % total) + total) % total;
+        slides[popupCarouselIndex].classList.add('active');
+        document.querySelectorAll('.popup-carousel-dot').forEach((d, idx) => { if (idx % total === popupCarouselIndex) d.classList.add('active'); });
+    }
+    function popupCarouselNext() { popupCarouselGoTo(popupCarouselIndex + 1); carouselRead = true; checkMulaiReady(); document.querySelectorAll('.popup-carousel-next').forEach(b => b.classList.remove('highlight-next')); }
+    function popupCarouselPrev() { popupCarouselGoTo(popupCarouselIndex - 1); }
+    document.querySelectorAll('.popup-carousel-slide:first-child .popup-carousel-next').forEach(b => b.classList.add('highlight-next'));
+
+    // ============ BLEED BACKGROUND SYNCHRONIZATION ============
+    function updateBleedBg(pageId) {
+        const bleedLanding = document.getElementById('bleedLanding');
+        const bleedMain = document.getElementById('bleedMain');
+        if (!bleedLanding || !bleedMain) return;
+        if (pageId === 'landing') {
+            bleedLanding.classList.add('active');
+            bleedMain.classList.remove('active');
+        } else {
+            bleedLanding.classList.remove('active');
+            bleedMain.classList.add('active');
+        }
+    }
+
+    // ============ NAVIGATION & MATERI LOTTIE ============
+    var materiLottieInstances = {};
+    var materiGasInstances = {};
+    function initMateriLottie(menuType) {
+        destroyMateriLottie(menuType);
+        var containerId = menuType === 'ekspirasi' ? 'materiLottieEkspirasi' : 'materiLottieInspirasi';
+        var container = document.getElementById(containerId);
+        if (!container) return;
+        var data = menuType === 'ekspirasi' ? EXHALE_DATA : INHALE_CONTROL_DATA;
+        var isLoop = true;
+        materiLottieInstances[menuType] = lottie.loadAnimation({
+            container: container,
+            renderer: 'svg',
+            loop: isLoop,
+            autoplay: false,
+            animationData: JSON.parse(JSON.stringify(data))
+        });
+        var gasContainerId = menuType === 'ekspirasi' ? 'materiLottieCO2' : 'materiLottieO2';
+        var gasContainer = document.getElementById(gasContainerId);
+        if (!gasContainer && container) {
+            gasContainer = document.createElement('div');
+            gasContainer.id = gasContainerId;
+            gasContainer.className = 'materi-lottie-gas';
+            container.appendChild(gasContainer);
+        }
+        if (gasContainer) {
+            var gasData = menuType === 'ekspirasi' ? CO2_DATA : O2_DATA;
+            materiGasInstances[menuType] = lottie.loadAnimation({
+                container: gasContainer,
+                renderer: 'svg',
+                loop: isLoop,
+                autoplay: false,
+                animationData: JSON.parse(JSON.stringify(gasData))
+            });
+        }
+    }
+    function destroyMateriLottie(menuType) {
+        if (materiLottieInstances[menuType]) {
+            materiLottieInstances[menuType].destroy();
+            delete materiLottieInstances[menuType];
+        }
+        if (materiGasInstances[menuType]) {
+            materiGasInstances[menuType].destroy();
+            delete materiGasInstances[menuType];
+        }
+    }
+    function destroyAllMateriLottie() {
+        Object.keys(materiLottieInstances).forEach(function(k) { destroyMateriLottie(k); });
+        Object.keys(materiGasInstances).forEach(function(k) {
+            if (materiGasInstances[k]) { materiGasInstances[k].destroy(); delete materiGasInstances[k]; }
+        });
+    }
+
+    // ============ MATERI SLIDER ============
+    var materiSliderInited = false;
+    var materiSliderVal = { inspirasi: 0, ekspirasi: 100 };
+    var materiHighlightTimers = {};
+    function cancelMateriHighlight(menuType) {
+        if (materiHighlightTimers[menuType]) {
+            clearTimeout(materiHighlightTimers[menuType]);
+            materiHighlightTimers[menuType] = null;
+        }
+    }
+    function scheduleMateriHighlight(menuType, ctrl) {
+        cancelMateriHighlight(menuType);
+        materiHighlightTimers[menuType] = setTimeout(function() {
+            materiHighlightTimers[menuType] = null;
+            var restPct = menuType === 'inspirasi' ? 0 : 100;
+            if (materiSliderVal[menuType] === restPct && ctrl.isConnected) ctrl.classList.add('highlight');
+        }, 850);
+    }
+    var materiVoDone = { inspirasi: true, ekspirasi: true };
+    var materiSliderDone = { inspirasi: true, ekspirasi: true };
+    var materiLockApplied = { inspirasi: false, ekspirasi: false };
+    var materiLockedEls = {};
+    var materiUnlockTargets = { inspirasi: ['ekspirasi'], ekspirasi: ['tantangan', 'inspirasi'] };
+    var voEndedQueue = [];
+    function registerVoEnded(cb) { voEndedQueue.push(cb); }
+    function flushVoEnded() {
+        var q = voEndedQueue;
+        voEndedQueue = [];
+        q.forEach(function(cb) { cb(); });
+    }
+    function updateMateriUnlock(menuType) {
+        if (!materiVoDone[menuType] || !materiSliderDone[menuType]) return;
+        var targets = materiUnlockTargets[menuType] || [];
+        (materiLockedEls[menuType] || []).forEach(function(el) {
+            if (targets.indexOf(el.dataset.menu) !== -1) el.classList.remove('locked');
+        });
+        materiLockedEls[menuType] = [];
+        checkMenuUnlocks();
+    }
+    function lockMateriPage(menuType) {
+        materiVoDone[menuType] = false;
+        materiSliderDone[menuType] = false;
+        materiLockedEls[menuType] = [];
+        document.querySelectorAll('.menu-item').forEach(function(el) {
+            if (el.dataset.menu !== menuType && !el.classList.contains('locked')) {
+                el.classList.add('locked');
+                materiLockedEls[menuType].push(el);
+            }
+        });
+        if (!currentVoice) {
+            materiVoDone[menuType] = true;
+        } else {
+            registerVoEnded(function() {
+                materiVoDone[menuType] = true;
+                updateMateriUnlock(menuType);
+            });
+            currentVoice.addEventListener('error', function() {
+                materiVoDone[menuType] = true;
+                updateMateriUnlock(menuType);
+            }, { once: true });
+        }
+        updateMateriUnlock(menuType);
+    }
+    function markMateriSliderTried(menuType) {
+        materiSliderDone[menuType] = true;
+        updateMateriUnlock(menuType);
+    }
+    function setMateriSliderVal(menuType, pct, deferHighlight) {
+        pct = Math.max(0, Math.min(100, pct));
+        materiSliderVal[menuType] = pct;
+        var panelId = menuType === 'ekspirasi' ? 'ekspirasi' : 'inspirasi';
+        var ctrl = document.querySelector('#' + panelId + ' .materi-slider-ctrl');
+        var bar = document.querySelector('#' + panelId + ' .materi-slider-bar');
+        if (!ctrl || !bar) return;
+        var barH = bar.clientHeight;
+        var ctrlH = ctrl.clientHeight || 28;
+        var topPx = (barH - ctrlH) * (pct / 100);
+        ctrl.style.bottom = topPx + 'px';
+        var anim = materiLottieInstances[menuType];
+        var gasAnim = materiGasInstances[menuType];
+        if (menuType === 'inspirasi') {
+            if (pct === 0) {
+                if (anim) anim.play();
+                if (gasAnim) gasAnim.play();
+                if (deferHighlight) {
+                    ctrl.classList.remove('highlight');
+                    scheduleMateriHighlight(menuType, ctrl);
+                } else {
+                    cancelMateriHighlight(menuType);
+                    ctrl.classList.add('highlight');
+                }
+            } else {
+                cancelMateriHighlight(menuType);
+                if (anim) { anim.pause(); anim.goToAndStop(Math.round(120 * pct / 100), true); }
+                if (gasAnim) { gasAnim.pause(); gasAnim.goToAndStop(Math.round(120 * pct / 100), true); }
+                ctrl.classList.remove('highlight');
+            }
+        } else {
+            if (pct === 100) {
+                if (anim) anim.play();
+                if (gasAnim) gasAnim.play();
+                if (deferHighlight) {
+                    ctrl.classList.remove('highlight');
+                    scheduleMateriHighlight(menuType, ctrl);
+                } else {
+                    cancelMateriHighlight(menuType);
+                    ctrl.classList.add('highlight');
+                }
+            } else {
+                cancelMateriHighlight(menuType);
+                var f = Math.round(120 * (100 - pct) / 100);
+                if (anim) { anim.pause(); anim.goToAndStop(f, true); }
+                if (gasAnim) { gasAnim.pause(); gasAnim.goToAndStop(f, true); }
+                ctrl.classList.remove('highlight');
+            }
+        }
+    }
+    function initMateriSlider() {
+        if (materiSliderInited) return;
+        materiSliderInited = true;
+        ['inspirasi', 'ekspirasi'].forEach(function(mt) {
+            var panelId = mt === 'ekspirasi' ? 'ekspirasi' : 'inspirasi';
+            var ctrl = document.querySelector('#' + panelId + ' .materi-slider-ctrl');
+            var wrap = document.querySelector('#' + panelId + ' .materi-slider-track');
+            if (!ctrl || !wrap) return;
+            var dragging = false;
+            function onMove(cy) {
+                var r = wrap.getBoundingClientRect();
+                var ch = ctrl.clientHeight || 28;
+                var pct = ((r.bottom - cy - ch / 2) / (r.height - ch)) * 100;
+                setMateriSliderVal(mt, pct);
+            }
+            ctrl.addEventListener('mousedown', function(e) {
+                dragging = true; e.preventDefault();
+                markMateriSliderTried(mt);
+                cancelMateriHighlight(mt);
+                ctrl.classList.add('highlight-ready');
+                ctrl.classList.remove('highlight');
+                ctrl.style.transition = 'none';
+                onMove(e.clientY);
+            });
+            ctrl.addEventListener('touchstart', function(e) {
+                dragging = true;
+                markMateriSliderTried(mt);
+                cancelMateriHighlight(mt);
+                ctrl.classList.add('highlight-ready');
+                ctrl.classList.remove('highlight');
+                ctrl.style.transition = 'none';
+                onMove(e.touches[0].clientY);
+            }, { passive: false });
+            window.addEventListener('mousemove', function(e) { if (dragging) { e.preventDefault(); onMove(e.clientY); } });
+            window.addEventListener('touchmove', function(e) { if (dragging) { e.preventDefault(); onMove(e.touches[0].clientY); } }, { passive: false });
+            window.addEventListener('mouseup', function() {
+                if (dragging) {
+                    dragging = false;
+                    ctrl.style.transition = '';
+                    ctrl.classList.remove('highlight-ready');
+                    setMateriSliderVal(mt, mt === 'inspirasi' ? 0 : 100, true);
+                }
+            });
+            window.addEventListener('touchend', function() {
+                if (dragging) {
+                    dragging = false;
+                    ctrl.style.transition = '';
+                    ctrl.classList.remove('highlight-ready');
+                    setMateriSliderVal(mt, mt === 'inspirasi' ? 0 : 100, true);
+                }
+            });
+        });
+    }
+
+    function goToPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) targetPage.classList.add('active');
+        updateBleedBg(pageId);
+        if (window.location.hash !== '#' + pageId) {
+            try { history.replaceState(null, '', '#' + pageId); } catch(e){}
+        }
+        onPageLoad(pageId);
+    }
+
+    // ============ LOTTIE INSTANCES ============
+    let lottiePetunjukBody = null;
+
+    // ============ PETUNJUK SLIDER ============
+    function initSliderDrag() {
+        const control = document.getElementById('sliderControl');
+        const bar = document.querySelector('.petunjuk-slider-bar');
+        const track = document.getElementById('petunjukSliderTrack');
+        if (!control || !bar || !track) return;
+        let dragging = false;
+        function setup() {
+            const barH = bar.clientHeight;
+            const ctrlH = control.clientHeight || 36;
+            const maxBot = barH - ctrlH;
+            control.style.bottom = (maxBot * 0.5) + 'px';
+            if (lottiePetunjukBody) {
+                lottiePetunjukBody.play();
+            }
+        }
+        function startDrag(cy) {
+            dragging = true;
+            control.classList.add('highlight-ready');
+            control.classList.remove('highlight');
+            control.style.transition = 'none';
+            if (lottiePetunjukBody) {
+                lottiePetunjukBody.pause();
+            }
+        }
+        function onMove(cy) {
+            if (!dragging) return;
+            const r = track.getBoundingClientRect();
+            const ch = control.clientHeight || 36;
+            const pct = ((r.bottom - cy - ch / 2) / (r.height - ch)) * 100;
+            const clampedPct = Math.max(0, Math.min(100, pct));
+            const barH = bar.clientHeight;
+            const maxBot = barH - ch;
+            control.style.bottom = (maxBot * clampedPct / 100) + 'px';
+            if (lottiePetunjukBody) {
+                const frame = Math.round(120 * clampedPct / 100);
+                lottiePetunjukBody.goToAndStop(frame, true);
+            }
+        }
+        function endDrag() {
+            if (!dragging) return;
+            dragging = false;
+            control.classList.remove('highlight-ready');
+            control.classList.add('highlight');
+            control.style.transition = '';
+            setup();
+        }
+        if (bar.complete && control.complete) {
+            requestAnimationFrame(setup);
+        } else {
+            let b = bar.complete, c = control.complete;
+            if (!b) bar.addEventListener('load', () => { b = true; if (c) requestAnimationFrame(setup); });
+            if (!c) control.addEventListener('load', () => { c = true; if (b) requestAnimationFrame(setup); });
+        }
+        control.addEventListener('mousedown', e => { e.preventDefault(); startDrag(e.clientY); });
+        control.addEventListener('touchstart', e => { startDrag(e.touches[0].clientY); }, {passive:true});
+        document.addEventListener('mousemove', e => { if (dragging) onMove(e.clientY); });
+        document.addEventListener('touchmove', e => { if (dragging) onMove(e.touches[0].clientY); }, {passive:true});
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+    }
+
+    // ============ TANTANGAN ============
+    let challengeRunning = false;
+    let challengePhase = '';
+    let challengePhaseTimer = null;
+    let challengeRound = 0;
+    let tahanDurationIndex = 0;
+    const tahanOptions = [5, 15, 30, 40, 50];
+    const INHALE_DUR = 3000;
+    const EXHALE_DUR = 3000;
+
+    function tambahTahan() {
+        if (tahanDurationIndex < tahanOptions.length - 1) {
+            tahanDurationIndex++;
+            updateDetikDisplay();
+            playSound('click');
+        }
+    }
+
+    function kurangTahan() {
+        if (tahanDurationIndex > 0) {
+            tahanDurationIndex--;
+            updateDetikDisplay();
+            playSound('click');
+        }
+    }
+
+    function updateDetikDisplay() {
+        const val = tahanOptions[tahanDurationIndex];
+        const detikValue = document.getElementById('detikValue');
+        if (detikValue) detikValue.textContent = val;
+    }
+
+    function startChallenge() {
+        challengeRunning = true;
+        challengeRound = 0;
+
+        const progress = document.getElementById('tantanganBarProgress');
+        if (progress) progress.style.left = '0px';
+        ['segInhale','segTahan','segExhale'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.style.width = '0px';
+        });
+
+        playSound('peluitStart');
+
+        const mulaiBtn = document.querySelector('.tantangan-mulai-btn');
+        const tahanBtns = document.querySelector('.tantangan-tahan-buttons');
+        if (mulaiBtn) mulaiBtn.style.display = 'none';
+        if (tahanBtns) tahanBtns.style.opacity = '0.3';
+        if (tahanBtns) tahanBtns.style.pointerEvents = 'none';
+
+        nextChallengePhase();
+    }
+
+    const BAR_MARKERS = [2.5, 25, 78.5, 100];
+
+    function nextChallengePhase() {
+        if (!challengeRunning) return;
+        if (challengePhaseTimer) cancelAnimationFrame(challengePhaseTimer);
+
+        const tahanDur = tahanOptions[tahanDurationIndex] * 1000;
+        const phases = [
+            {type:'inhale', dur:INHALE_DUR, startMarker:0, endMarker:1},
+            {type:'tahan', dur:tahanDur, startMarker:1, endMarker:2},
+            {type:'exhale', dur:EXHALE_DUR, startMarker:2, endMarker:3}
+        ];
+        const phase = phases[challengeRound % phases.length];
+        challengePhase = phase.type;
+
+        const progress = document.getElementById('tantanganBarProgress');
+        const seg = document.getElementById('seg' + phase.type.charAt(0).toUpperCase() + phase.type.slice(1));
+        const barBg = document.querySelector('.tantangan-bar-bg');
+        if (!progress || !barBg) return;
+
+        const barWidth = barBg.clientWidth;
+        const progressWidth = progress.clientWidth || (barWidth * (49.1 / 1233.8));
+        const contentWidth = barWidth - progressWidth;
+        const startPx = (BAR_MARKERS[phase.startMarker] / 100) * contentWidth;
+        const endPx = (BAR_MARKERS[phase.endMarker] / 100) * contentWidth;
+        const fullSegWidth = endPx - startPx;
+        const startTime = performance.now();
+
+        if (seg) { seg.style.left = startPx + 'px'; seg.style.width = '0px'; }
+
+        function frame(now) {
+            if (!challengeRunning) return;
+            const elapsed = now - startTime;
+            const t = Math.min(elapsed / phase.dur, 1);
+            const currentPx = startPx + (endPx - startPx) * t;
+            progress.style.left = currentPx + 'px';
+            if (seg) seg.style.width = (currentPx - startPx) + 'px';
+            if (t < 1) {
+                challengePhaseTimer = requestAnimationFrame(frame);
+            } else {
+                progress.style.left = endPx + 'px';
+                if (seg) seg.style.width = fullSegWidth + 'px';
+                challengeRound++;
+                if (challengeRound >= 3) {
+                    endChallenge();
+                } else {
+                    nextChallengePhase();
+                }
+            }
+        }
+        challengePhaseTimer = requestAnimationFrame(frame);
+    }
+
+    function endChallenge() {
+        challengeRunning = false;
+        if (challengePhaseTimer) cancelAnimationFrame(challengePhaseTimer);
+
+        menuVisited.tantangan = true;
+        checkMenuUnlocks();
+
+        const mulaiBtn = document.querySelector('.tantangan-mulai-btn');
+        const tahanBtns = document.querySelector('.tantangan-tahan-buttons');
+        if (mulaiBtn) mulaiBtn.style.display = '';
+        if (tahanBtns) tahanBtns.style.opacity = '1';
+        if (tahanBtns) tahanBtns.style.pointerEvents = 'auto';
+
+        playSound('peluitFinish');
+    }
+
+    // ============ SOAL/KUIS ============
+    const questions = [
+        {
+            q: 'Proses menarik napas ke dalam tubuh disebut dengan istilah apa?',
+            opts: ['Inspirasi', 'Ekspirasi', 'Oksigenisasi'],
+            ans: 0
+        },
+        {
+            q: 'Otot sekat dada berbentuk kubah yang bergerak turun mendatar saat kita menarik napas adalah...?',
+            opts: ['Diafragma', 'Otot Jantung', 'Otot Tulang Rusuk'],
+            ans: 0
+        },
+        {
+            q: 'Bagaimana kondisi paru-paru saat kalian melakukan inspirasi?',
+            opts: ['Mengembang', 'Mengempis', 'Tidak Berubah'],
+            ans: 0
+        },
+        {
+            q: 'Gas sisa apakah yang terdorong keluar dari hidung saat kita melakukan Ekspirasi?',
+            opts: ['Karbon Dioksida (CO2)', 'Oksigen (O2)', 'Hidrogen'],
+            ans: 0
+        }
+    ];
+
+    let currentSoal = 0;
+    let soalScore = 0;
+    let soalAnswered = [];
+    let soalOrder = [];
+
+    function shuffleArray(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    function renderSoal() {
+        const q = questions[currentSoal];
+        const soalText = document.getElementById('soalText');
+        const num = String(currentSoal + 1).padStart(2, '0');
+        soalText.innerHTML = '<div class="soal-number">SOAL ' + num + '</div>' + q.q;
+
+        if (!soalOrder[currentSoal]) {
+            const indices = q.opts.map((_, i) => i);
+            soalOrder[currentSoal] = shuffleArray(indices);
+        }
+        const order = soalOrder[currentSoal];
+
+        const container = document.getElementById('optionsContainer');
+        container.innerHTML = '';
+
+        order.forEach((origIdx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            if (soalAnswered[currentSoal] !== undefined) {
+                btn.classList.add('disabled');
+                if (origIdx === q.ans) btn.classList.add('correct');
+                if (soalAnswered[currentSoal] === origIdx && origIdx !== q.ans) btn.classList.add('wrong');
+            }
+            btn.textContent = q.opts[origIdx];
+            btn.onclick = () => answerSoal(origIdx);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('btnPrevSoal').disabled = currentSoal === 0;
+        if (currentSoal === questions.length - 1 && soalAnswered.length === questions.length) {
+            document.getElementById('btnNextSoal').style.display = 'none';
+            document.getElementById('btnFinish').style.display = 'inline-block';
+        } else {
+            document.getElementById('btnNextSoal').style.display = 'inline-block';
+            document.getElementById('btnFinish').style.display = 'none';
+        }
+    }
+
+    function answerSoal(idx) {
+        if (soalAnswered[currentSoal] !== undefined) return;
+        soalAnswered[currentSoal] = idx;
+        const q = questions[currentSoal];
+        if (idx === q.ans) {
+            soalScore += 25;
+            playSound('correct');
+        } else {
+            playSound('wrong');
+        }
+        renderSoal();
+    }
+
+    function nextSoal() {
+        if (currentSoal < questions.length - 1) {
+            currentSoal++;
+            renderSoal();
+            playSound('click');
+        }
+    }
+
+    function prevSoal() {
+        if (currentSoal > 0) {
+            currentSoal--;
+            renderSoal();
+            playSound('click');
+        }
+    }
+
+    // ============ RESULT ============
+    function showResult() {
+        if (currentVoice) { currentVoice.pause(); currentVoice.currentTime = 0; currentVoice = null; restoreMusicVol(); }
+        document.getElementById('finalScore').textContent = soalScore;
+        goToPage('result');
+        const correctCount = Math.round(soalScore / 25);
+        if (correctCount >= 1 && correctCount <= 4) {
+            setTimeout(function() { playSound('vo_benar_' + correctCount); }, 100);
+        }
+    }
+
+    function resetGame() {
+        challengeRunning = false;
+        if (challengePhaseTimer) cancelAnimationFrame(challengePhaseTimer);
+        soalScore = 0;
+        currentSoal = 0;
+        soalAnswered = [];
+        soalOrder = [];
+        challengeRound = 0;
+        tahanDurationIndex = 0;
+        updateDetikDisplay();
+
+        const progress = document.getElementById('tantanganBarProgress');
+        if (progress) progress.style.left = '0px';
+        ['segInhale','segTahan','segExhale'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.style.width = '0px';
+        });
+
+        const mulaiBtn = document.querySelector('.tantangan-mulai-btn');
+        const tahanBtns = document.querySelector('.tantangan-tahan-buttons');
+        if (mulaiBtn) mulaiBtn.style.display = '';
+        if (tahanBtns) tahanBtns.style.opacity = '1';
+        if (tahanBtns) tahanBtns.style.pointerEvents = 'auto';
+
+        goToPage('landing');
+    }
+
+    // ============ PAGE LOAD ============
+    function onPageLoad(pageId) {
+        destroyAllMateriLottie();
+        document.querySelectorAll('.menu-item').forEach(function(el){el.classList.remove('active')});
+        document.querySelectorAll('.menu-item[data-menu="'+pageId+'"]').forEach(function(el){el.classList.add('active')});
+        if (pageId === 'inspirasi') menuVisited.inspirasi = true;
+        if (pageId === 'ekspirasi') menuVisited.ekspirasi = true;
+        checkMenuUnlocks();
+
+        if (pageId !== 'landing') {
+            const voEl = document.getElementById('voCountdown');
+            if (voEl && (!currentVoice || currentVoice.paused)) {
+                voEl.classList.remove('visible');
+            }
+        }
+
+        if (pageId === 'petunjuk') {
+            playSound('vo_petunjuk');
+            if (!sliderInited) { sliderInited = true; initSliderDrag(); }
+            if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
+            const c = document.getElementById('lottie-petunjuk-body');
+            if (c && typeof NAPAS_IDLE_DATA !== 'undefined') {
+                lottiePetunjukBody = lottie.loadAnimation({container:c, renderer:'svg', loop:true, autoplay:true, animationData:JSON.parse(JSON.stringify(NAPAS_IDLE_DATA))});
+            }
+            document.querySelectorAll('.menu-item[data-menu="inspirasi"],.menu-item[data-menu="ekspirasi"]').forEach(function(el){el.classList.add('locked')});
+            var sliderCtrl = document.getElementById('sliderControl');
+            if (sliderCtrl) sliderCtrl.classList.add('highlight');
+            if (currentVoice) {
+                currentVoice.addEventListener('ended', function() {
+                    document.querySelectorAll('.menu-item[data-menu="inspirasi"],.menu-item[data-menu="ekspirasi"]').forEach(function(el){el.classList.remove('locked')});
+                }, { once: true });
+            }
+        } else if (pageId === 'inspirasi') {
+            if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
+            initMateriLottie('inspirasi');
+            initMateriSlider();
+            setMateriSliderVal('inspirasi', 0);
+            playSound('vo_inspirasi');
+            if (!materiLockApplied.inspirasi) {
+                materiLockApplied.inspirasi = true;
+                lockMateriPage('inspirasi');
+            }
+        } else if (pageId === 'ekspirasi') {
+            if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
+            initMateriLottie('ekspirasi');
+            initMateriSlider();
+            setMateriSliderVal('ekspirasi', 100);
+            playSound('vo_ekspirasi');
+            if (!materiLockApplied.ekspirasi) {
+                materiLockApplied.ekspirasi = true;
+                lockMateriPage('ekspirasi');
+            }
+        } else if (pageId === 'tantangan') {
+            if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
+            const btn = document.getElementById('tantanganMulaiBtn');
+            if (btn) btn.classList.add('locked');
+            playSound('vo_tantangan');
+            if (currentVoice) {
+                currentVoice.addEventListener('ended', function() {
+                    if (btn) btn.classList.remove('locked');
+                }, { once: true });
+                currentVoice.addEventListener('error', function() {
+                    if (btn) btn.classList.remove('locked');
+                }, { once: true });
+            } else {
+                if (btn) btn.classList.remove('locked');
+            }
+        } else if (pageId === 'soal') {
+            if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
+            if (currentVoice) { currentVoice.pause(); currentVoice.currentTime = 0; restoreMusicVol(); }
+            const opts = document.getElementById('optionsContainer');
+            if (opts) opts.style.pointerEvents = 'none';
+            renderSoal();
+            playSound('vo_refleksi');
+            if (currentVoice) {
+                currentVoice.addEventListener('ended', function() {
+                    if (opts) opts.style.pointerEvents = '';
+                }, { once: true });
+                currentVoice.addEventListener('error', function() {
+                    if (opts) opts.style.pointerEvents = '';
+                }, { once: true });
+            } else {
+                if (opts) opts.style.pointerEvents = '';
+            }
+        } else if (pageId === 'landing') {
+            if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
+        }
+    }
+
+    // ============ INIT ============
+    let landingVoPlayed = false;
+    let voFinished = false;
+    let carouselRead = false;
+    let sliderInited = false;
+    let menuVisited = { inspirasi: false, ekspirasi: false, tantangan: false };
+    function checkMenuUnlocks() {
+        const items = document.querySelectorAll('.menu-item');
+        items.forEach(el => {
+            const m = el.dataset.menu;
+            if (m === 'tantangan' && menuVisited.inspirasi && menuVisited.ekspirasi) el.classList.remove('locked');
+            if (m === 'soal' && menuVisited.tantangan) el.classList.remove('locked');
+        });
+    }
+    function checkMulaiReady() {
+        if (voFinished && carouselRead) {
+            document.getElementById('mulaiBtn').classList.remove('locked');
+        }
+    }
+    function skipVoPembukaan() {
+        if (currentVoice) { currentVoice.pause(); currentVoice.currentTime = 0; restoreMusicVol(); }
+        voFinished = true;
+        checkMulaiReady();
+        const countdownEl = document.getElementById('voCountdown');
+        countdownEl.classList.remove('visible');
+    }
+    function startVoCountdown(voAudio) {
+        const countdownEl = document.getElementById('voCountdown');
+        const numberEl = document.getElementById('countdownNumber');
+        countdownEl.classList.add('visible');
+        numberEl.textContent = '...';
+        function updateRemaining() {
+            const dur = voAudio.duration || 0;
+            if (dur > 0) numberEl.textContent = Math.max(0, Math.ceil(dur - voAudio.currentTime));
+        }
+        voAudio.addEventListener('loadedmetadata', updateRemaining);
+        voAudio.addEventListener('timeupdate', updateRemaining);
+        voAudio.addEventListener('ended', function() {
+            numberEl.textContent = '0';
+            setTimeout(() => { countdownEl.classList.remove('visible'); }, 1200);
+        });
+    }
+
+    document.getElementById('landing').addEventListener('click', function handler(e) {
+        if (!landingVoPlayed) {
+            landingVoPlayed = true;
+            const vo = getAudio(audioFiles.vo_pembukaan);
+            currentVoice = vo;
+            startVoCountdown(vo);
+            vo.addEventListener('ended', function() {
+                voFinished = true;
+                checkMulaiReady();
+                setTimeout(() => {
+                    const countdownEl = document.getElementById('voCountdown');
+                    countdownEl.classList.remove('visible');
+                }, 1200);
+            });
+            vo.play().catch(()=>{});
+            startMusic();
+        }
+    });
+
+    function unlockAll() {
+        document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('locked', 'disabled'));
+        const btn = document.getElementById('mulaiBtn');
+        if (btn) btn.classList.remove('locked');
+        const tBtn = document.getElementById('tantanganMulaiBtn');
+        if (tBtn) tBtn.classList.remove('locked');
+        menuVisited = { inspirasi: true, ekspirasi: true, tantangan: true };
+    }
+    window.unlockAll = unlockAll;
+
+    function handleHashRoute() {
+        const hash = (window.location.hash || '').replace('#', '');
+        if (hash && document.getElementById(hash)) {
+            goToPage(hash);
+        } else {
+            updateBleedBg('landing');
+        }
+    }
+    window.addEventListener('hashchange', handleHashRoute);
+
+    if (document.readyState === 'loading') {
+        window.addEventListener('DOMContentLoaded', handleHashRoute);
+    } else {
+        handleHashRoute();
+    }
+    </script>
+</body>
+</html>

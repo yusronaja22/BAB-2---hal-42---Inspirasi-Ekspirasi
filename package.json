@@ -1,0 +1,20 @@
+{
+  "name": "inspirasi-ekspirasi-game",
+  "version": "1.0.0",
+  "description": "Game Pembelajaran Mekanisme Pernapasan: Inspirasi dan Ekspirasi",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx -y serve . -l 3000",
+    "start": "npx -y serve . -l 3000"
+  },
+  "keywords": [
+    "educational-game",
+    "respiratory-system",
+    "inspirasi-ekspirasi",
+    "interactive-learning",
+    "biology",
+    "kemendikdasmen"
+  ],
+  "author": "",
+  "license": "MIT"
+}
