@@ -5,17 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Inspirasi & Ekspirasi - Game Pembelajaran Pernapasan</title>
     <script src="assets/js/lottie.min.js"></script>
-    <script src="assets/js/napas-idle-data.js"></script>
+
+    <script src="assets/js/pernapasan-data.js"></script>
     <script src="assets/js/inhale-control-data.js"></script>
     <script src="assets/js/exhale-data.js"></script>
     <script src="assets/js/O2-data.js"></script>
     <script src="assets/js/CO2-data.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: inherit;
         }
         html, body {
             width: 100%;
@@ -74,20 +78,18 @@
             pointer-events: none;
         }
 
-        /* ===== UNIFIED 16:9 RESPONSIVE GAME STAGE ===== */
+        /* ===== FULL RESPONSIVE GAME STAGE ===== */
         .game-stage {
             position: relative;
             z-index: 2;
-            width: min(100vw, calc(100vh * (16 / 9)));
-            height: min(100vh, calc(100vw * (9 / 16)));
-            aspect-ratio: 16 / 9;
+            width: 100%;
+            height: 100%;
             container-type: size;
             container-name: stage;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 252, 249, 0.12);
         }
 
         /* ===== PAGE CONTAINER ===== */
@@ -111,7 +113,7 @@
             inset: 0;
             width: 100%;
             height: 100%;
-            object-fit: fill;
+            object-fit: cover;
             z-index: 0;
             pointer-events: none;
         }
@@ -275,7 +277,7 @@
         }
         .popup-carousel {
             position: relative;
-            width: 41cqw;
+            width: min(41cqw, 75cqh);
             max-width: 600px;
             line-height: 0;
         }
@@ -300,7 +302,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: space-between;
             padding: 7% 12% 6%;
             opacity: 0;
             transition: opacity 0.4s ease;
@@ -311,6 +313,14 @@
         .popup-carousel-slide.active {
             opacity: 1;
             pointer-events: auto;
+        }
+        .popup-carousel-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
         }
         .popup-carousel-slide h3 {
             color: #00fcf9;
@@ -475,13 +485,13 @@
             justify-content: center;
             width: 100%;
             height: 100%;
-            padding-top: 6cqh;
-            padding-bottom: 12cqh;
+            padding-top: 4cqh;
+            padding-bottom: 6cqh;
         }
         .petunjuk-card-wrap {
             position: relative;
-            width: 82cqw;
-            max-width: 1260px;
+            width: min(65cqw, 115cqh);
+            max-width: 1050px;
             line-height: 0;
         }
         .petunjuk-card-bg {
@@ -543,33 +553,32 @@
             font-family: 'Nunito', sans-serif;
             letter-spacing: 0.3px;
         }
-        .slider-label-top { margin-bottom: 0.6cqh; }
-        .slider-label-bottom { margin-top: 0.6cqh; }
+        .slider-label-top { margin-bottom: 0; }
+        .slider-label-bottom { margin-top: 0; }
         .slider-track {
             position: relative;
-            width: clamp(14px, 1.8cqw, 28px);
-            flex: 1;
+            width: clamp(9px, 1.1cqw, 17px);
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .petunjuk-slider-bar {
-            height: 100%;
-            width: auto;
+            height: auto;
+            width: 100%;
             display: block;
         }
         .petunjuk-slider-control {
             position: absolute;
             left: 50%;
-            transform: translateX(-50%);
-            width: clamp(24px, 2.7cqw, 42px);
+            transform: translate(-50%, 50%);
+            width: clamp(15px, 1.6cqw, 25px);
             height: auto;
             pointer-events: auto;
             cursor: grab;
             z-index: 10;
             transition: bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .petunjuk-slider-control:active { cursor: grabbing; }
+        .petunjuk-slider-control:active { cursor: grabbing; transform: translate(-50%, 50%) scale(0.9); }
 
         .petunjuk-text-col {
             flex: 1;
@@ -582,9 +591,9 @@
         }
         .petunjuk-title {
             color: #00fcf9;
-            font-size: clamp(13px, 1.45cqw, 23px);
+            font-size: clamp(12px, 1.35cqw, 20px);
             font-weight: 800;
-            margin-bottom: 1.5cqh;
+            margin-bottom: 1.2cqh;
             text-shadow: 0 0 8px rgba(0, 252, 249, 0.4);
         }
         .petunjuk-points {
@@ -597,8 +606,8 @@
             padding-left: 1.8cqw;
             margin-bottom: 1.2cqh;
             color: #fff;
-            font-size: clamp(9px, 1.05cqw, 15px);
-            line-height: 1.55;
+            font-size: clamp(8px, 0.9cqw, 13px);
+            line-height: 1.5;
         }
         .petunjuk-points li::before {
             content: "";
@@ -688,26 +697,25 @@
             white-space: nowrap;
             font-family: 'Nunito', sans-serif;
         }
-        .materi-slider-label-top { margin-bottom: 0.6cqh; }
-        .materi-slider-label-bottom { margin-top: 0.6cqh; }
+        .materi-slider-label-top { margin-bottom: 0; }
+        .materi-slider-label-bottom { margin-top: 0; }
         .materi-slider-track {
             position: relative;
-            width: clamp(14px, 1.8cqw, 28px);
-            flex: 1;
+            width: clamp(9px, 1.1cqw, 17px);
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .materi-slider-bar {
-            height: 100%;
-            width: auto;
+            height: auto;
+            width: 100%;
             display: block;
         }
         .materi-slider-ctrl {
             position: absolute;
             left: 50%;
-            transform: translateX(-50%);
-            width: clamp(22px, 2.5cqw, 38px);
+            transform: translate(-50%, 50%);
+            width: clamp(15px, 1.6cqw, 25px);
             height: auto;
             bottom: 0;
             pointer-events: auto;
@@ -715,7 +723,7 @@
             z-index: 10;
             transition: bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .materi-slider-ctrl:active { cursor: grabbing; }
+        .materi-slider-ctrl:active { cursor: grabbing; transform: translate(-50%, 50%) scale(0.9); }
 
         .materi-card-col {
             flex: 0 0 38cqw;
@@ -1074,6 +1082,23 @@
             from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes floatAnim {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); filter: drop-shadow(0 15px 10px rgba(0,0,0,0.4)); }
+            100% { transform: translateY(0px); }
+        }
+        @keyframes pulseAnim {
+            0% { transform: translateY(0px) scale(1); filter: drop-shadow(0 0 5px rgba(0, 252, 249, 0.4)); }
+            50% { transform: translateY(-12px) scale(1.08); filter: drop-shadow(0 0 15px rgba(0, 252, 249, 0.8)); }
+            100% { transform: translateY(0px) scale(1); filter: drop-shadow(0 0 5px rgba(0, 252, 249, 0.4)); }
+        }
+        .title-svg {
+            animation: floatAnim 3s ease-in-out infinite;
+        }
+        .mulai-img {
+            animation: pulseAnim 3s ease-in-out infinite;
+            border-radius: 20px;
+        }
         @keyframes sliderGlow {
             0%, 100% {
                 filter: drop-shadow(0 0 4px #00fcf9) drop-shadow(0 0 8px #00fcf9);
@@ -1101,36 +1126,155 @@
             transition: all 0.3s;
         }
 
+        /* ===== FS PROMPT MODAL ===== */
+        .fs-prompt-modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 13, 26, 0.85);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .fs-prompt-modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        .fs-prompt-content {
+            background: rgba(0, 30, 60, 0.95);
+            border: 2px solid #00fcf9;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 252, 249, 0.4);
+            max-width: 400px;
+            width: 80%;
+        }
+        .fs-prompt-content h2 {
+            color: #00fcf9;
+            font-size: clamp(18px, 2cqw, 24px);
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+        .fs-prompt-content p {
+            color: #fff;
+            font-size: clamp(12px, 1.2cqw, 16px);
+            margin-bottom: 25px;
+        }
+        .fs-prompt-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .btn-fs-prompt {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: clamp(12px, 1.2cqw, 16px);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Nunito', sans-serif;
+        }
+        .btn-ya {
+            background: #00fcf9;
+            color: #001228;
+        }
+        .btn-ya:hover {
+            box-shadow: 0 0 12px #00fcf9;
+            transform: scale(1.05);
+        }
+        .btn-tidak {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #fff;
+        }
+        .btn-tidak:hover {
+            background: rgba(255,255,255,0.1);
+            transform: scale(1.05);
+        }
+
         /* ===== SAFE AREA & MOBILE ORIENTATION HINT ===== */
         @supports(padding: max(0px)) {
             .logo-kemendikdasmen { left: max(2.8cqw, env(safe-area-inset-left)); }
             .top-controls { right: max(2.8cqw, env(safe-area-inset-right)); }
         }
 
-        .orientation-hint {
+        .orientation-blocker {
             display: none;
             position: fixed;
-            bottom: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 18, 40, 0.9);
-            border: 1px solid #00fcf9;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            width: 100dvw;
+            height: 100dvh;
+            background: #000d1a;
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             color: #00fcf9;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 6px 14px;
-            border-radius: 20px;
-            z-index: 1000;
-            pointer-events: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-            white-space: nowrap;
+            font-family: 'Nunito', sans-serif;
+            text-align: center;
+            padding: 20px;
         }
-        @media (orientation: portrait) and (max-width: 768px) {
-            .orientation-hint {
-                display: flex;
-                align-items: center;
-                gap: 6px;
+        .orientation-blocker svg {
+            margin-bottom: 24px;
+            animation: rotatePhone 2s infinite ease-in-out;
+        }
+        @keyframes rotatePhone {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-90deg); }
+            100% { transform: rotate(-90deg); }
+        }
+        .orientation-blocker h2 {
+            font-size: clamp(20px, 4vw, 28px);
+            margin-bottom: 12px;
+            text-shadow: 0 0 10px rgba(0, 252, 249, 0.5);
+            font-weight: 800;
+        }
+        .orientation-blocker p {
+            font-size: clamp(14px, 3vw, 18px);
+            color: #fff;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+        
+        @media (orientation: portrait) {
+            .game-stage {
+                display: none !important;
             }
+            .bg-full-bleed {
+                display: none !important;
+            }
+            .orientation-blocker {
+                display: flex;
+            }
+        }
+        .btn-selanjutnya {
+            padding: clamp(7px, 0.8cqh, 11px) clamp(17px, 2.1cqw, 28px);
+            border: 2px solid #00fcf9;
+            background: rgba(0, 252, 249, 0.15);
+            color: #00fcf9;
+            font-family: 'Nunito', sans-serif;
+            font-size: clamp(10px, 1.05cqw, 15px);
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 0 10px rgba(0, 252, 249, 0.3);
+            margin-top: 2cqh;
+        }
+        .btn-selanjutnya:hover {
+            background: #00fcf9;
+            color: #001228;
+            box-shadow: 0 0 20px rgba(0, 252, 249, 0.6);
+            transform: scale(1.05);
+        }
+        .btn-selanjutnya:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
@@ -1162,21 +1306,35 @@
                     <div class="title-container">
                         <img src="assets/images/judul.svg" class="title-svg" alt="Inspirasi &amp; Ekspirasi">
                     </div>
+                    <button class="mulai-btn" id="mulaiBtn" onclick="promptFullscreen()">
+                        <img src="assets/images/mulai.svg" class="mulai-img" alt="Mulai">
+                    </button>
+                </div>
+            </div>
+
+            <!-- CAROUSEL PAGE -->
+            <div class="page" id="carousel-page">
+                <img src="assets/images/BG_awal.svg" class="stage-bg" alt="">
+                <div class="landing-content">
                     <div class="popup-carousel">
                         <img src="assets/images/popup_large.svg" class="popup-carousel-bg" alt="">
                         <div class="popup-carousel-slides">
                             <div class="popup-carousel-slide active">
-                                <h3>Tujuan Pembelajaran</h3>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                                <div class="popup-carousel-text">
+                                    <h3>Tujuan Pembelajaran</h3>
+                                    <p>Siswa mampu membedakan proses yang terjadi pada Inspirasi dan Ekspirasi.</p>
+                                </div>
                                 <div class="popup-carousel-nav">
                                     <button class="popup-carousel-btn popup-carousel-prev" onclick="popupCarouselPrev()">&#10094;</button>
                                     <span class="popup-carousel-dots"><span class="popup-carousel-dot active" onclick="popupCarouselGoTo(0)"></span><span class="popup-carousel-dot" onclick="popupCarouselGoTo(1)"></span></span>
-                                    <button class="popup-carousel-btn popup-carousel-next" onclick="popupCarouselNext()">&#10095;</button>
+                                    <button class="popup-carousel-btn popup-carousel-next highlight-next" onclick="popupCarouselNext()">&#10095;</button>
                                 </div>
                             </div>
                             <div class="popup-carousel-slide">
-                                <h3>Misi</h3>
-                                <p>Kendalikan kerja sistem pernapasan Banu untuk memahami perbedaan menarik dan menghembuskan napas!</p>
+                                <div class="popup-carousel-text">
+                                    <h3>Misi</h3>
+                                    <p>Kendalikan kerja sistem pernapasan Banu untuk memahami perbedaan menarik dan menghembuskan napas!</p>
+                                </div>
                                 <div class="popup-carousel-nav">
                                     <button class="popup-carousel-btn popup-carousel-prev" onclick="popupCarouselPrev()">&#10094;</button>
                                     <span class="popup-carousel-dots"><span class="popup-carousel-dot active" onclick="popupCarouselGoTo(0)"></span><span class="popup-carousel-dot" onclick="popupCarouselGoTo(1)"></span></span>
@@ -1185,18 +1343,9 @@
                             </div>
                         </div>
                     </div>
-                    <button class="mulai-btn locked" id="mulaiBtn" onclick="goToPage('petunjuk')">
-                        <img src="assets/images/mulai.svg" class="mulai-img" alt="Mulai">
+                    <button class="btn-selanjutnya" id="mulaiBtnCarousel" onclick="goToPage('petunjuk')">
+                        Selanjutnya
                     </button>
-                </div>
-            </div>
-
-            <!-- VO COUNTDOWN -->
-            <div class="vo-countdown" id="voCountdown">
-                <button class="vo-skip" id="voSkip" onclick="skipVoPembukaan()">&#10005;</button>
-                <div class="countdown-timer">
-                    <svg class="countdown-clock" viewBox="0 0 40 40"><circle cx="20" cy="22" r="16" fill="none" stroke="#00fcf9" stroke-width="2"/><line x1="20" y1="22" x2="20" y2="12" stroke="#00fcf9" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="22" x2="27" y2="22" stroke="#00fcf9" stroke-width="2" stroke-linecap="round"/><rect x="16" y="4" width="8" height="4" rx="1" fill="#00fcf9"/></svg>
-                    <span id="countdownNumber">0</span>
                 </div>
             </div>
 
@@ -1222,36 +1371,15 @@
                                 <h2 class="petunjuk-title">Petunjuk Penggunaan:</h2>
                                 <ul class="petunjuk-points">
                                     <li>Coba geser slider untuk melihat langsung bagaimana paru-paru dan diafragma bergerak saat udara masuk dan keluar!</li>
-                                    <li>Kamu bisa bebas mengklik tombol Inspirasi, atau Ekspirasi di layar kapan saja untuk membaca penjelasannya.</li>
-                                    <li>Klik tombol tantangan untuk berpindah ke adegan seru dan cari tahu seberapa kuat kamu bisa menahan napas!</li>
+                                    <li>Kamu bisa bebas mengklik tombol Inspirasi, atau Ekspirasi di layar kapan saja untuk membaca penjelasannya</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
 
-                    <!-- MENU GRID -->
-                    <div class="menu-grid" id="menuGridPetunjuk">
-                        <div class="menu-item locked" onclick="playSound('click'); goToPage('inspirasi')" data-menu="inspirasi">
-                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
-                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
-                            <span class="menu-label">Inspirasi</span>
-                        </div>
-                        <div class="menu-item locked" onclick="playSound('click'); goToPage('ekspirasi')" data-menu="ekspirasi">
-                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
-                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
-                            <span class="menu-label">Ekspirasi</span>
-                        </div>
-                        <div class="menu-item locked" onclick="playSound('click'); goToPage('tantangan')" data-menu="tantangan">
-                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
-                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
-                            <span class="menu-label">Tantangan</span>
-                        </div>
-                        <div class="menu-item locked" onclick="playSound('click'); goToPage('soal')" data-menu="soal">
-                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
-                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
-                            <span class="menu-label">Soal</span>
-                        </div>
-                    </div>
+                    <button class="btn-selanjutnya" onclick="playSound('click'); goToPage('inspirasi')" style="margin-top: 3cqh; z-index: 10;">
+                        Selanjutnya
+                    </button>
                 </div>
             </div>
 
@@ -1296,12 +1424,12 @@
                             <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
                             <span class="menu-label">Ekspirasi</span>
                         </div>
-                        <div class="menu-item locked" onclick="playSound('click'); goToPage('tantangan')" data-menu="tantangan">
+                        <div class="menu-item" onclick="playSound('click'); goToPage('tantangan')" data-menu="tantangan">
                             <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
                             <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
                             <span class="menu-label">Tantangan</span>
                         </div>
-                        <div class="menu-item locked" onclick="playSound('click'); goToPage('soal')" data-menu="soal">
+                        <div class="menu-item" onclick="playSound('click'); goToPage('soal')" data-menu="soal">
                             <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
                             <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
                             <span class="menu-label">Soal</span>
@@ -1351,12 +1479,12 @@
                             <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
                             <span class="menu-label">Ekspirasi</span>
                         </div>
-                        <div class="menu-item locked" onclick="playSound('click'); goToPage('tantangan')" data-menu="tantangan">
+                        <div class="menu-item" onclick="playSound('click'); goToPage('tantangan')" data-menu="tantangan">
                             <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
                             <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
                             <span class="menu-label">Tantangan</span>
                         </div>
-                        <div class="menu-item locked" onclick="playSound('click'); goToPage('soal')" data-menu="soal">
+                        <div class="menu-item" onclick="playSound('click'); goToPage('soal')" data-menu="soal">
                             <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
                             <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
                             <span class="menu-label">Soal</span>
@@ -1419,7 +1547,7 @@
                             <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
                             <span class="menu-label">Tantangan</span>
                         </div>
-                        <div class="menu-item locked" onclick="playSound('click'); goToPage('soal')" data-menu="soal">
+                        <div class="menu-item" onclick="playSound('click'); goToPage('soal')" data-menu="soal">
                             <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
                             <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
                             <span class="menu-label">Soal</span>
@@ -1469,8 +1597,25 @@
             </div>
         </div>
 
-        <div class="orientation-hint">
-            <span>🔄 Putar ke mode lanskap untuk pengalaman terbaik</span>
+        <!-- FULLSCREEN PROMPT MODAL -->
+        <div id="fsPromptModal" class="fs-prompt-modal">
+            <div class="fs-prompt-content">
+                <h2>Mode Layar Penuh</h2>
+                <p>Apakah Anda ingin masuk ke mode layar penuh?</p>
+                <div class="fs-prompt-buttons">
+                    <button class="btn-fs-prompt btn-ya" onclick="acceptFullscreen()">Ya</button>
+                    <button class="btn-fs-prompt btn-tidak" onclick="declineFullscreen()">Tidak</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="orientation-blocker">
+            <svg viewBox="0 0 24 24" width="80" height="80" stroke="#00fcf9" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+            <h2>Putar Perangkat Anda</h2>
+            <p>Silakan putar perangkat Anda ke mode lanskap untuk pengalaman bermain yang maksimal.</p>
         </div>
     </div>
 
@@ -1580,6 +1725,37 @@
         } else {
             document.exitFullscreen().catch(()=>{});
         }
+    }
+
+    function promptFullscreen() {
+        playSound('click');
+        startMusic();
+        if (document.fullscreenElement) {
+            goToPage('carousel-page');
+            return;
+        }
+        const modal = document.getElementById('fsPromptModal');
+        if (modal) modal.classList.add('active');
+    }
+
+    function acceptFullscreen() {
+        playSound('click');
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(()=>{});
+        }
+        closeFullscreenPrompt();
+        goToPage('carousel-page');
+    }
+
+    function declineFullscreen() {
+        playSound('click');
+        closeFullscreenPrompt();
+        goToPage('carousel-page');
+    }
+
+    function closeFullscreenPrompt() {
+        const modal = document.getElementById('fsPromptModal');
+        if (modal) modal.classList.remove('active');
     }
 
     // ============ POPUP CAROUSEL ============
@@ -1705,27 +1881,8 @@
         checkMenuUnlocks();
     }
     function lockMateriPage(menuType) {
-        materiVoDone[menuType] = false;
-        materiSliderDone[menuType] = false;
-        materiLockedEls[menuType] = [];
-        document.querySelectorAll('.menu-item').forEach(function(el) {
-            if (el.dataset.menu !== menuType && !el.classList.contains('locked')) {
-                el.classList.add('locked');
-                materiLockedEls[menuType].push(el);
-            }
-        });
-        if (!currentVoice) {
-            materiVoDone[menuType] = true;
-        } else {
-            registerVoEnded(function() {
-                materiVoDone[menuType] = true;
-                updateMateriUnlock(menuType);
-            });
-            currentVoice.addEventListener('error', function() {
-                materiVoDone[menuType] = true;
-                updateMateriUnlock(menuType);
-            }, { once: true });
-        }
+        materiVoDone[menuType] = true;
+        materiSliderDone[menuType] = true;
         updateMateriUnlock(menuType);
     }
     function markMateriSliderTried(menuType) {
@@ -1740,8 +1897,7 @@
         var bar = document.querySelector('#' + panelId + ' .materi-slider-bar');
         if (!ctrl || !bar) return;
         var barH = bar.clientHeight;
-        var ctrlH = ctrl.clientHeight || 28;
-        var topPx = (barH - ctrlH) * (pct / 100);
+        var topPx = barH * (pct / 100);
         ctrl.style.bottom = topPx + 'px';
         var anim = materiLottieInstances[menuType];
         var gasAnim = materiGasInstances[menuType];
@@ -1793,8 +1949,7 @@
             var dragging = false;
             function onMove(cy) {
                 var r = wrap.getBoundingClientRect();
-                var ch = ctrl.clientHeight || 28;
-                var pct = ((r.bottom - cy - ch / 2) / (r.height - ch)) * 100;
+                var pct = ((r.bottom - cy) / r.height) * 100;
                 setMateriSliderVal(mt, pct);
             }
             ctrl.addEventListener('mousedown', function(e) {
@@ -1859,8 +2014,7 @@
         let dragging = false;
         function setup() {
             const barH = bar.clientHeight;
-            const ctrlH = control.clientHeight || 36;
-            const maxBot = barH - ctrlH;
+            const maxBot = barH;
             control.style.bottom = (maxBot * 0.5) + 'px';
             if (lottiePetunjukBody) {
                 lottiePetunjukBody.play();
@@ -1878,11 +2032,10 @@
         function onMove(cy) {
             if (!dragging) return;
             const r = track.getBoundingClientRect();
-            const ch = control.clientHeight || 36;
-            const pct = ((r.bottom - cy - ch / 2) / (r.height - ch)) * 100;
+            const pct = ((r.bottom - cy) / r.height) * 100;
             const clampedPct = Math.max(0, Math.min(100, pct));
             const barH = bar.clientHeight;
-            const maxBot = barH - ch;
+            const maxBot = barH;
             control.style.bottom = (maxBot * clampedPct / 100) + 'px';
             if (lottiePetunjukBody) {
                 const frame = Math.round(120 * clampedPct / 100);
@@ -2194,22 +2347,28 @@
             }
         }
 
-        if (pageId === 'petunjuk') {
+        if (pageId === 'carousel-page') {
+            playSound('vo_pembukaan');
+            if (currentVoice) {
+                startVoCountdown(currentVoice);
+                currentVoice.addEventListener('ended', function() {
+                    voFinished = true;
+                    setTimeout(() => {
+                        const countdownEl = document.getElementById('voCountdown');
+                        if (countdownEl) countdownEl.classList.remove('visible');
+                    }, 1200);
+                });
+            }
+        } else if (pageId === 'petunjuk') {
             playSound('vo_petunjuk');
             if (!sliderInited) { sliderInited = true; initSliderDrag(); }
             if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
             const c = document.getElementById('lottie-petunjuk-body');
-            if (c && typeof NAPAS_IDLE_DATA !== 'undefined') {
-                lottiePetunjukBody = lottie.loadAnimation({container:c, renderer:'svg', loop:true, autoplay:true, animationData:JSON.parse(JSON.stringify(NAPAS_IDLE_DATA))});
+            if (c && typeof PERNAPASAN_DATA !== 'undefined') {
+                lottiePetunjukBody = lottie.loadAnimation({container:c, renderer:'svg', loop:true, autoplay:true, animationData:JSON.parse(JSON.stringify(PERNAPASAN_DATA))});
             }
-            document.querySelectorAll('.menu-item[data-menu="inspirasi"],.menu-item[data-menu="ekspirasi"]').forEach(function(el){el.classList.add('locked')});
             var sliderCtrl = document.getElementById('sliderControl');
             if (sliderCtrl) sliderCtrl.classList.add('highlight');
-            if (currentVoice) {
-                currentVoice.addEventListener('ended', function() {
-                    document.querySelectorAll('.menu-item[data-menu="inspirasi"],.menu-item[data-menu="ekspirasi"]').forEach(function(el){el.classList.remove('locked')});
-                }, { once: true });
-            }
         } else if (pageId === 'inspirasi') {
             if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
             initMateriLottie('inspirasi');
@@ -2233,18 +2392,8 @@
         } else if (pageId === 'tantangan') {
             if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
             const btn = document.getElementById('tantanganMulaiBtn');
-            if (btn) btn.classList.add('locked');
+            if (btn) btn.classList.remove('locked');
             playSound('vo_tantangan');
-            if (currentVoice) {
-                currentVoice.addEventListener('ended', function() {
-                    if (btn) btn.classList.remove('locked');
-                }, { once: true });
-                currentVoice.addEventListener('error', function() {
-                    if (btn) btn.classList.remove('locked');
-                }, { once: true });
-            } else {
-                if (btn) btn.classList.remove('locked');
-            }
         } else if (pageId === 'soal') {
             if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
             if (currentVoice) { currentVoice.pause(); currentVoice.currentTime = 0; restoreMusicVol(); }
@@ -2276,9 +2425,7 @@
     function checkMenuUnlocks() {
         const items = document.querySelectorAll('.menu-item');
         items.forEach(el => {
-            const m = el.dataset.menu;
-            if (m === 'tantangan' && menuVisited.inspirasi && menuVisited.ekspirasi) el.classList.remove('locked');
-            if (m === 'soal' && menuVisited.tantangan) el.classList.remove('locked');
+            el.classList.remove('locked', 'disabled');
         });
     }
     function checkMulaiReady() {
@@ -2291,11 +2438,12 @@
         voFinished = true;
         checkMulaiReady();
         const countdownEl = document.getElementById('voCountdown');
-        countdownEl.classList.remove('visible');
+        if (countdownEl) countdownEl.classList.remove('visible');
     }
     function startVoCountdown(voAudio) {
         const countdownEl = document.getElementById('voCountdown');
         const numberEl = document.getElementById('countdownNumber');
+        if (!countdownEl || !numberEl) return;
         countdownEl.classList.add('visible');
         numberEl.textContent = '...';
         function updateRemaining() {
@@ -2309,25 +2457,6 @@
             setTimeout(() => { countdownEl.classList.remove('visible'); }, 1200);
         });
     }
-
-    document.getElementById('landing').addEventListener('click', function handler(e) {
-        if (!landingVoPlayed) {
-            landingVoPlayed = true;
-            const vo = getAudio(audioFiles.vo_pembukaan);
-            currentVoice = vo;
-            startVoCountdown(vo);
-            vo.addEventListener('ended', function() {
-                voFinished = true;
-                checkMulaiReady();
-                setTimeout(() => {
-                    const countdownEl = document.getElementById('voCountdown');
-                    countdownEl.classList.remove('visible');
-                }, 1200);
-            });
-            vo.play().catch(()=>{});
-            startMusic();
-        }
-    });
 
     function unlockAll() {
         document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('locked', 'disabled'));
@@ -2349,10 +2478,17 @@
     }
     window.addEventListener('hashchange', handleHashRoute);
 
+    function initGame() {
+        if (window.location.hash) {
+            history.replaceState(null, '', ' ');
+        }
+        goToPage('landing');
+    }
+
     if (document.readyState === 'loading') {
-        window.addEventListener('DOMContentLoaded', handleHashRoute);
+        window.addEventListener('DOMContentLoaded', initGame);
     } else {
-        handleHashRoute();
+        initGame();
     }
     </script>
 </body>
