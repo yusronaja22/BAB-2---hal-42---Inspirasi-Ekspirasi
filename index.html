@@ -682,9 +682,12 @@
             height: 100% !important;
             object-fit: contain;
         }
+        .materi-content.with-slider {
+            gap: 1.1cqw;
+        }
         .materi-slider-col {
-            flex: 0 0 8%;
-            max-width: 60px;
+            flex: 0 0 0px;
+            width: 0px;
             height: 75%;
             display: flex;
             flex-direction: column;
@@ -692,6 +695,7 @@
             justify-content: center;
             position: relative;
             z-index: 5;
+            transform: translateX(-4cqw);
         }
         .materi-slider-label-top, .materi-slider-label-bottom {
             color: #00fcf9;
@@ -1458,7 +1462,7 @@
             <div class="page" id="inspirasi">
                 <img src="assets/images/BG_main.svg" class="stage-bg" alt="">
                 <div class="materi-page">
-                    <div class="materi-content fade-in">
+                    <div class="materi-content fade-in with-slider">
                         <div class="materi-lottie-col">
                             <div class="materi-lottie" id="materiLottieInspirasi">
                                 <div class="materi-lottie-gas" id="materiLottieO2"></div>
@@ -1517,7 +1521,7 @@
             <div class="page" id="ekspirasi">
                 <img src="assets/images/BG_main.svg" class="stage-bg" alt="">
                 <div class="materi-page">
-                    <div class="materi-content fade-in">
+                    <div class="materi-content fade-in with-slider">
                         <div class="materi-lottie-col">
                             <div class="materi-lottie" id="materiLottieEkspirasi">
                                 <div class="materi-lottie-gas" id="materiLottieCO2"></div>
