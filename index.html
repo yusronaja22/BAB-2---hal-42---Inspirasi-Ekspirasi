@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Inspirasi & Ekspirasi - Game Pembelajaran Pernapasan</title>
     <script src="assets/js/lottie.min.js"></script>
-
+    <script src="assets/js/napas-idle-data.js"></script>
     <script src="assets/js/pernapasan-data.js"></script>
+    <script src="assets/js/tarik-napas-data.js"></script>
     <script src="assets/js/inhale-control-data.js"></script>
     <script src="assets/js/exhale-data.js"></script>
+    <script src="assets/js/hembus-napas-data.js"></script>
     <script src="assets/js/O2-data.js"></script>
     <script src="assets/js/CO2-data.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -191,8 +193,8 @@
             justify-content: center;
             gap: 1.2cqw;
             z-index: 15;
-            width: 58cqw;
-            max-width: 860px;
+            width: 72cqw;
+            max-width: 1000px;
         }
         .menu-item {
             position: relative;
@@ -645,7 +647,8 @@
             position: relative;
         }
         .materi-lottie-col {
-            flex: 0 0 35cqw;
+            flex: 1 1 42%;
+            max-width: 45%;
             height: 100%;
             display: flex;
             align-items: center;
@@ -680,7 +683,8 @@
             object-fit: contain;
         }
         .materi-slider-col {
-            flex: 0 0 6cqw;
+            flex: 0 0 8%;
+            max-width: 60px;
             height: 75%;
             display: flex;
             flex-direction: column;
@@ -726,7 +730,8 @@
         .materi-slider-ctrl:active { cursor: grabbing; transform: translate(-50%, 50%) scale(0.9); }
 
         .materi-card-col {
-            flex: 0 0 38cqw;
+            flex: 1 1 45%;
+            max-width: 500px;
             height: 88%;
             display: flex;
             align-items: center;
@@ -749,32 +754,37 @@
         }
         .materi-body {
             position: absolute;
-            top: 14%;
-            bottom: 14%;
-            left: 14%;
-            right: 12%;
+            top: 18%;
+            bottom: 18%;
+            left: 20%;
+            right: 20%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: justify;
-            overflow: hidden;
+            overflow-y: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
             line-height: 1.5;
+        }
+        .materi-body::-webkit-scrollbar {
+            display: none;
         }
         .materi-body h2 {
             color: #00fcf9;
-            font-size: clamp(13px, 1.5cqw, 23px);
+            font-size: clamp(11px, 1.5cqw, 23px);
             font-weight: 800;
-            margin-bottom: 1.5cqh;
+            margin-bottom: 1cqh;
             text-align: center;
             align-self: center;
             text-shadow: 0 0 8px rgba(0, 252, 249, 0.4);
         }
         .materi-body p {
             color: #fff;
-            font-size: clamp(9px, 0.95cqw, 14.5px);
+            font-size: clamp(8px, 0.95cqw, 14.5px);
             line-height: 1.55;
-            margin-bottom: 1.2cqh;
+            margin-bottom: 0.8cqh;
             width: 100%;
         }
         .materi-body .highlight {
@@ -793,7 +803,17 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-around;
+            justify-content: center;
+        }
+        .tantangan-soal-text {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: clamp(14px, 2.5cqw, 32px);
+            color: #ffffff;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
+            text-align: center;
+            line-height: 1.5;
+            padding: 0 5%;
         }
         .tantangan-timeline-wrap {
             width: 92%;
@@ -1371,15 +1391,67 @@
                                 <h2 class="petunjuk-title">Petunjuk Penggunaan:</h2>
                                 <ul class="petunjuk-points">
                                     <li>Coba geser slider untuk melihat langsung bagaimana paru-paru dan diafragma bergerak saat udara masuk dan keluar!</li>
-                                    <li>Kamu bisa bebas mengklik tombol Inspirasi, atau Ekspirasi di layar kapan saja untuk membaca penjelasannya</li>
+                                    <li>Kamu bisa bebas mengklik tombol menu di bawah layar kapan saja untuk membaca penjelasannya</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
 
-                    <button class="btn-selanjutnya" onclick="playSound('click'); goToPage('inspirasi')" style="margin-top: 3cqh; z-index: 10;">
+                    <button class="btn-selanjutnya" onclick="playSound('click'); goToPage('mekanisme')" style="margin-top: 3cqh; z-index: 10;">
                         Selanjutnya
                     </button>
+                </div>
+            </div>
+
+            <!-- MEKANISME PAGE -->
+            <div class="page" id="mekanisme">
+                <img src="assets/images/BG_main.svg" class="stage-bg" alt="">
+                <div class="materi-page">
+                    <div class="materi-content fade-in">
+                        <div class="materi-lottie-col">
+                            <div class="materi-lottie" id="lottie-mekanisme-body"></div>
+                        </div>
+                        <div class="materi-card-col">
+                            <div class="materi-popup-wrap">
+                                <img src="assets/images/popup_desc.svg" class="materi-popup-bg" alt="">
+                                <div class="materi-body">
+                                    <h2>Mekanisme Pernapasan</h2>
+                                    <ul class="petunjuk-points" style="color: #fff; font-size: clamp(8px, 1cqw, 15px); text-align: left; padding-left: 1.5cqw; line-height: 1.5; align-self: flex-start; width: 100%;">
+                                        <li style="margin-bottom: 1cqh;">Perhatikan animasi untuk melihat langsung bagaimana paru-paru dan diafragma bergerak saat udara masuk dan keluar!</li>
+                                        <li>Kamu bisa bebas mengklik tombol menu di bawah layar kapan saja untuk mempelajari hal lainnya.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- MENU GRID -->
+                    <div class="menu-grid">
+                        <div class="menu-item" onclick="playSound('click'); goToPage('mekanisme')" data-menu="mekanisme">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label" style="white-space: normal; line-height: 1.1;">Mekanisme<br>Pernafasan</span>
+                        </div>
+                        <div class="menu-item" onclick="playSound('click'); goToPage('inspirasi')" data-menu="inspirasi">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Inspirasi</span>
+                        </div>
+                        <div class="menu-item" onclick="playSound('click'); goToPage('ekspirasi')" data-menu="ekspirasi">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Ekspirasi</span>
+                        </div>
+                        <div class="menu-item" onclick="playSound('click'); goToPage('tantangan')" data-menu="tantangan">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Tantangan</span>
+                        </div>
+                        <div class="menu-item" onclick="playSound('click'); goToPage('soal')" data-menu="soal">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label">Soal</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1394,12 +1466,11 @@
                             </div>
                         </div>
                         <div class="materi-slider-col">
-                            <span class="materi-slider-label-top">Tarik Nafas</span>
                             <div class="materi-slider-track">
                                 <img src="assets/images/slider_bar.svg" class="materi-slider-bar" alt="">
                                 <img src="assets/images/slider_control.svg" class="materi-slider-ctrl" alt="">
                             </div>
-                            <span class="materi-slider-label-bottom">Hembus Nafas</span>
+                            <span class="materi-slider-label-bottom">Tarik Nafas</span>
                         </div>
                         <div class="materi-card-col">
                             <div class="materi-popup-wrap">
@@ -1414,6 +1485,11 @@
                         </div>
                     </div>
                     <div class="menu-grid">
+                        <div class="menu-item" onclick="playSound('click'); goToPage('mekanisme')" data-menu="mekanisme">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label" style="white-space: normal; line-height: 1.1;">Mekanisme<br>Pernafasan</span>
+                        </div>
                         <div class="menu-item" onclick="playSound('click'); goToPage('inspirasi')" data-menu="inspirasi">
                             <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
                             <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
@@ -1449,12 +1525,11 @@
                             </div>
                         </div>
                         <div class="materi-slider-col">
-                            <span class="materi-slider-label-top">Tarik Nafas</span>
+                            <span class="materi-slider-label-top">Hembus Nafas</span>
                             <div class="materi-slider-track">
                                 <img src="assets/images/slider_bar.svg" class="materi-slider-bar" alt="">
                                 <img src="assets/images/slider_control.svg" class="materi-slider-ctrl" alt="">
                             </div>
-                            <span class="materi-slider-label-bottom">Hembus Nafas</span>
                         </div>
                         <div class="materi-card-col">
                             <div class="materi-popup-wrap">
@@ -1469,6 +1544,11 @@
                         </div>
                     </div>
                     <div class="menu-grid">
+                        <div class="menu-item" onclick="playSound('click'); goToPage('mekanisme')" data-menu="mekanisme">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label" style="white-space: normal; line-height: 1.1;">Mekanisme<br>Pernafasan</span>
+                        </div>
                         <div class="menu-item" onclick="playSound('click'); goToPage('inspirasi')" data-menu="inspirasi">
                             <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
                             <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
@@ -1500,38 +1580,19 @@
                     <div class="petunjuk-card-wrap fade-in">
                         <img src="assets/images/popup_large.svg" class="petunjuk-card-bg" alt="">
                         <div class="tantangan-card-inner">
-                            <div class="tantangan-timeline-wrap">
-                                <div class="tantangan-bar-container">
-                                    <div class="tantangan-bar-segment seg-inhale" id="segInhale"></div>
-                                    <div class="tantangan-bar-segment seg-tahan" id="segTahan"></div>
-                                    <div class="tantangan-bar-segment seg-exhale" id="segExhale"></div>
-                                    <img src="assets/images/tantangan_bar.svg" class="tantangan-bar-bg" alt="">
-                                    <img src="assets/images/tantangan_progres.svg" class="tantangan-bar-progress" id="tantanganBarProgress" alt="">
-                                </div>
-                                <div class="tantangan-bar-labels">
-                                    <span>TARIK NAPAS</span>
-                                    <span>TAHAN NAPAS</span>
-                                    <span>HEMBUS NAPAS</span>
-                                </div>
-                            </div>
-                            <div class="tantangan-center-controls">
-                                <div class="tantangan-tahan-buttons">
-                                    <button class="tahan-btn" id="btnKurangDetik" onclick="kurangTahan()"><img src="assets/images/kurang-detik.svg" alt="-"></button>
-                                    <div class="detik-wrap">
-                                        <img src="assets/images/detik.svg" class="detik-display" id="detikDisplay" alt="">
-                                        <span class="detik-value" id="detikValue">5</span>
-                                    </div>
-                                    <button class="tahan-btn" id="btnTambahDetik" onclick="tambahTahan()"><img src="assets/images/tambah-detik.svg" alt="+"></button>
-                                </div>
-                                <button class="tantangan-mulai-btn" id="tantanganMulaiBtn" onclick="startChallenge()">
-                                    <img src="assets/images/mulai.svg" alt="Mulai">
-                                </button>
-                            </div>
+                            <p class="tantangan-soal-text">
+                                Mengapa ketika kita selesai berlari kencang, otot diafragma bekerja jauh lebih cepat? Yuk, catat analisis ini di buku tugasmu!
+                            </p>
                         </div>
                     </div>
 
                     <!-- MENU GRID -->
                     <div class="menu-grid">
+                        <div class="menu-item" onclick="playSound('click'); goToPage('mekanisme')" data-menu="mekanisme">
+                            <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
+                            <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
+                            <span class="menu-label" style="white-space: normal; line-height: 1.1;">Mekanisme<br>Pernafasan</span>
+                        </div>
                         <div class="menu-item" onclick="playSound('click'); goToPage('inspirasi')" data-menu="inspirasi">
                             <img src="assets/images/menu_off.svg" class="menu-bg menu-off" alt="">
                             <img src="assets/images/menu_on.svg" class="menu-bg menu-on" alt="">
@@ -1564,7 +1625,7 @@
                         <img src="assets/images/popup_large.svg" class="petunjuk-card-bg" alt="">
                         <div class="soal-card-inner">
                             <div class="soal-question-wrap">
-                                <p class="soal-text" id="soalText"></p>
+                                <div class="soal-text" id="soalText"></div>
                             </div>
                             <div class="options-container" id="optionsContainer"></div>
                             <div class="soal-nav">
@@ -1796,7 +1857,7 @@
         var containerId = menuType === 'ekspirasi' ? 'materiLottieEkspirasi' : 'materiLottieInspirasi';
         var container = document.getElementById(containerId);
         if (!container) return;
-        var data = menuType === 'ekspirasi' ? EXHALE_DATA : INHALE_CONTROL_DATA;
+        var data = menuType === 'ekspirasi' ? HEMBUS_NAPAS_DATA : TARIK_NAPAS_DATA;
         var isLoop = true;
         materiLottieInstances[menuType] = lottie.loadAnimation({
             container: container,
@@ -1843,7 +1904,7 @@
 
     // ============ MATERI SLIDER ============
     var materiSliderInited = false;
-    var materiSliderVal = { inspirasi: 0, ekspirasi: 100 };
+    var materiSliderVal = { inspirasi: 100, ekspirasi: 0 };
     var materiHighlightTimers = {};
     function cancelMateriHighlight(menuType) {
         if (materiHighlightTimers[menuType]) {
@@ -1914,8 +1975,9 @@
                 }
             } else {
                 cancelMateriHighlight(menuType);
-                if (anim) { anim.pause(); anim.goToAndStop(Math.round(120 * pct / 100), true); }
-                if (gasAnim) { gasAnim.pause(); gasAnim.goToAndStop(Math.round(120 * pct / 100), true); }
+                var f = Math.round(120 * (100 - pct) / 100);
+                if (anim) { anim.pause(); anim.goToAndStop(f, true); }
+                if (gasAnim) { gasAnim.pause(); gasAnim.goToAndStop(f, true); }
                 ctrl.classList.remove('highlight');
             }
         } else {
@@ -1931,7 +1993,7 @@
                 }
             } else {
                 cancelMateriHighlight(menuType);
-                var f = Math.round(120 * (100 - pct) / 100);
+                var f = Math.round(120 * pct / 100);
                 if (anim) { anim.pause(); anim.goToAndStop(f, true); }
                 if (gasAnim) { gasAnim.pause(); gasAnim.goToAndStop(f, true); }
                 ctrl.classList.remove('highlight');
@@ -1977,7 +2039,7 @@
                     dragging = false;
                     ctrl.style.transition = '';
                     ctrl.classList.remove('highlight-ready');
-                    setMateriSliderVal(mt, mt === 'inspirasi' ? 0 : 100, true);
+                    setMateriSliderVal(mt, mt === 'inspirasi' ? 100 : 0, true);
                 }
             });
             window.addEventListener('touchend', function() {
@@ -1985,7 +2047,7 @@
                     dragging = false;
                     ctrl.style.transition = '';
                     ctrl.classList.remove('highlight-ready');
-                    setMateriSliderVal(mt, mt === 'inspirasi' ? 0 : 100, true);
+                    setMateriSliderVal(mt, mt === 'inspirasi' ? 100 : 0, true);
                 }
             });
         });
@@ -2004,8 +2066,119 @@
 
     // ============ LOTTIE INSTANCES ============
     let lottiePetunjukBody = null;
+    let lottieMekanismeBody = null;
 
     // ============ PETUNJUK SLIDER ============
+    function initMekanismeSliderDrag() {
+        const control = document.getElementById('sliderControlMekanisme');
+        const bar = document.querySelector('.mekanisme-slider-bar');
+        const track = document.getElementById('mekanismeSliderTrack');
+        if (!control || !bar || !track) return;
+        let dragging = false;
+        function setup() {
+            const barH = bar.clientHeight;
+            const maxBot = barH;
+            control.style.bottom = (maxBot * 0.5) + 'px';
+            if (lottieMekanismeBody) lottieMekanismeBody.play();
+        }
+        function startDrag(cy) {
+            dragging = true;
+            control.classList.add('highlight-ready');
+            control.classList.remove('highlight');
+            control.style.transition = 'none';
+            if (lottieMekanismeBody) lottieMekanismeBody.pause();
+        }
+        function onMove(cy) {
+            if (!dragging) return;
+            const r = track.getBoundingClientRect();
+            const pct = ((r.bottom - cy) / r.height) * 100;
+            const clampedPct = Math.max(0, Math.min(100, pct));
+            const barH = bar.clientHeight;
+            const maxBot = barH;
+            control.style.bottom = (maxBot * clampedPct / 100) + 'px';
+            if (lottieMekanismeBody) {
+                const frame = Math.round(120 * clampedPct / 100);
+                lottieMekanismeBody.goToAndStop(frame, true);
+            }
+        }
+        function endDrag() {
+            if (!dragging) return;
+            dragging = false;
+            control.classList.remove('highlight-ready');
+            control.classList.add('highlight');
+            control.style.transition = '';
+            setup();
+        }
+        if (bar.complete && control.complete) {
+            requestAnimationFrame(setup);
+        } else {
+            let b = bar.complete, c = control.complete;
+            if (!b) bar.addEventListener('load', () => { b = true; if (c) requestAnimationFrame(setup); });
+            if (!c) control.addEventListener('load', () => { c = true; if (b) requestAnimationFrame(setup); });
+        }
+        control.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientY), {passive:false});
+        control.addEventListener('mousedown', (e) => { e.preventDefault(); startDrag(e.clientY); });
+        document.addEventListener('touchmove', (e) => onMove(e.touches[0].clientY), {passive:false});
+        document.addEventListener('mousemove', (e) => onMove(e.clientY));
+        document.addEventListener('touchend', endDrag);
+        document.addEventListener('mouseup', endDrag);
+    }
+
+    function initMekanismeSliderDrag() {
+        const control = document.getElementById('sliderControlMekanisme');
+        const bar = document.querySelector('.mekanisme-slider-bar');
+        const track = document.getElementById('mekanismeSliderTrack');
+        if (!control || !bar || !track) return;
+        let dragging = false;
+        function setup() {
+            const barH = bar.clientHeight;
+            const maxBot = barH;
+            control.style.bottom = (maxBot * 0.5) + 'px';
+            if (lottieMekanismeBody) lottieMekanismeBody.play();
+        }
+        function startDrag(cy) {
+            dragging = true;
+            control.classList.add('highlight-ready');
+            control.classList.remove('highlight');
+            control.style.transition = 'none';
+            if (lottieMekanismeBody) lottieMekanismeBody.pause();
+        }
+        function onMove(cy) {
+            if (!dragging) return;
+            const r = track.getBoundingClientRect();
+            const pct = ((r.bottom - cy) / r.height) * 100;
+            const clampedPct = Math.max(0, Math.min(100, pct));
+            const barH = bar.clientHeight;
+            const maxBot = barH;
+            control.style.bottom = (maxBot * clampedPct / 100) + 'px';
+            if (lottieMekanismeBody) {
+                const frame = Math.round(120 * clampedPct / 100);
+                lottieMekanismeBody.goToAndStop(frame, true);
+            }
+        }
+        function endDrag() {
+            if (!dragging) return;
+            dragging = false;
+            control.classList.remove('highlight-ready');
+            control.classList.add('highlight');
+            control.style.transition = '';
+            setup();
+        }
+        if (bar.complete && control.complete) {
+            requestAnimationFrame(setup);
+        } else {
+            let b = bar.complete, c = control.complete;
+            if (!b) bar.addEventListener('load', () => { b = true; if (c) requestAnimationFrame(setup); });
+            if (!c) control.addEventListener('load', () => { c = true; if (b) requestAnimationFrame(setup); });
+        }
+        control.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientY), {passive:false});
+        control.addEventListener('mousedown', (e) => { e.preventDefault(); startDrag(e.clientY); });
+        document.addEventListener('touchmove', (e) => onMove(e.touches[0].clientY), {passive:false});
+        document.addEventListener('mousemove', (e) => onMove(e.clientY));
+        document.addEventListener('touchend', endDrag);
+        document.addEventListener('mouseup', endDrag);
+    }
+
     function initSliderDrag() {
         const control = document.getElementById('sliderControl');
         const bar = document.querySelector('.petunjuk-slider-bar');
@@ -2363,17 +2536,29 @@
             playSound('vo_petunjuk');
             if (!sliderInited) { sliderInited = true; initSliderDrag(); }
             if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
+            if (lottieMekanismeBody) { lottieMekanismeBody.destroy(); lottieMekanismeBody = null; }
             const c = document.getElementById('lottie-petunjuk-body');
-            if (c && typeof PERNAPASAN_DATA !== 'undefined') {
-                lottiePetunjukBody = lottie.loadAnimation({container:c, renderer:'svg', loop:true, autoplay:true, animationData:JSON.parse(JSON.stringify(PERNAPASAN_DATA))});
+            if (c && typeof NAPAS_IDLE_DATA !== 'undefined') {
+                lottiePetunjukBody = lottie.loadAnimation({container:c, renderer:'svg', loop:true, autoplay:true, animationData:JSON.parse(JSON.stringify(NAPAS_IDLE_DATA))});
             }
             var sliderCtrl = document.getElementById('sliderControl');
             if (sliderCtrl) sliderCtrl.classList.add('highlight');
+        } else if (pageId === 'mekanisme') {
+            if (!mekanismeSliderInited) { mekanismeSliderInited = true; initMekanismeSliderDrag(); }
+            if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
+            if (lottieMekanismeBody) { lottieMekanismeBody.destroy(); lottieMekanismeBody = null; }
+            const c = document.getElementById('lottie-mekanisme-body');
+            if (c && typeof PERNAPASAN_DATA !== 'undefined') {
+                lottieMekanismeBody = lottie.loadAnimation({container:c, renderer:'svg', loop:true, autoplay:true, animationData:JSON.parse(JSON.stringify(PERNAPASAN_DATA))});
+            }
+            var sliderCtrlM = document.getElementById('sliderControlMekanisme');
+            if (sliderCtrlM) sliderCtrlM.classList.add('highlight');
         } else if (pageId === 'inspirasi') {
             if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
+            if (lottieMekanismeBody) { lottieMekanismeBody.destroy(); lottieMekanismeBody = null; }
             initMateriLottie('inspirasi');
             initMateriSlider();
-            setMateriSliderVal('inspirasi', 0);
+            setMateriSliderVal('inspirasi', 100);
             playSound('vo_inspirasi');
             if (!materiLockApplied.inspirasi) {
                 materiLockApplied.inspirasi = true;
@@ -2381,9 +2566,10 @@
             }
         } else if (pageId === 'ekspirasi') {
             if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
+            if (lottieMekanismeBody) { lottieMekanismeBody.destroy(); lottieMekanismeBody = null; }
             initMateriLottie('ekspirasi');
             initMateriSlider();
-            setMateriSliderVal('ekspirasi', 100);
+            setMateriSliderVal('ekspirasi', 0);
             playSound('vo_ekspirasi');
             if (!materiLockApplied.ekspirasi) {
                 materiLockApplied.ekspirasi = true;
@@ -2391,26 +2577,15 @@
             }
         } else if (pageId === 'tantangan') {
             if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
+            if (lottieMekanismeBody) { lottieMekanismeBody.destroy(); lottieMekanismeBody = null; }
             const btn = document.getElementById('tantanganMulaiBtn');
             if (btn) btn.classList.remove('locked');
-            playSound('vo_tantangan');
+            playSound('vo_refleksi');
         } else if (pageId === 'soal') {
             if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
+            if (lottieMekanismeBody) { lottieMekanismeBody.destroy(); lottieMekanismeBody = null; }
             if (currentVoice) { currentVoice.pause(); currentVoice.currentTime = 0; restoreMusicVol(); }
-            const opts = document.getElementById('optionsContainer');
-            if (opts) opts.style.pointerEvents = 'none';
             renderSoal();
-            playSound('vo_refleksi');
-            if (currentVoice) {
-                currentVoice.addEventListener('ended', function() {
-                    if (opts) opts.style.pointerEvents = '';
-                }, { once: true });
-                currentVoice.addEventListener('error', function() {
-                    if (opts) opts.style.pointerEvents = '';
-                }, { once: true });
-            } else {
-                if (opts) opts.style.pointerEvents = '';
-            }
         } else if (pageId === 'landing') {
             if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
         }
@@ -2421,6 +2596,7 @@
     let voFinished = false;
     let carouselRead = false;
     let sliderInited = false;
+    let mekanismeSliderInited = false;
     let menuVisited = { inspirasi: false, ekspirasi: false, tantangan: false };
     function checkMenuUnlocks() {
         const items = document.querySelectorAll('.menu-item');
@@ -2493,3 +2669,4 @@
     </script>
 </body>
 </html>
+
