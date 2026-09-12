@@ -1414,18 +1414,7 @@
                         <div class="materi-lottie-col">
                             <div class="materi-lottie" id="lottie-mekanisme-body"></div>
                         </div>
-                        <div class="materi-card-col">
-                            <div class="materi-popup-wrap">
-                                <img src="assets/images/popup_desc.svg" class="materi-popup-bg" alt="">
-                                <div class="materi-body">
-                                    <h2>Mekanisme Pernapasan</h2>
-                                    <ul class="petunjuk-points" style="color: #fff; font-size: clamp(8px, 1cqw, 15px); text-align: left; padding-left: 1.5cqw; line-height: 1.5; align-self: flex-start; width: 100%;">
-                                        <li style="margin-bottom: 1cqh;">Perhatikan animasi untuk melihat langsung bagaimana paru-paru dan diafragma bergerak saat udara masuk dan keluar!</li>
-                                        <li>Kamu bisa bebas mengklik tombol menu di bawah layar kapan saja untuk mempelajari hal lainnya.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                     <!-- MENU GRID -->
                     <div class="menu-grid">
@@ -1774,6 +1763,15 @@
         if (musicAudio && musicEnabled) musicAudio.volume = 0.07;
     }
 
+    function stopVO() {
+        if (currentVoice) {
+            currentVoice.pause();
+            currentVoice.currentTime = 0;
+            restoreMusicVol();
+            currentVoice = null;
+        }
+    }
+
     function toggleMusic() {
         musicEnabled = !musicEnabled;
         const icon = document.getElementById('musicIcon');
@@ -2060,6 +2058,7 @@
     }
 
     function goToPage(pageId) {
+        stopVO();
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         const targetPage = document.getElementById(pageId);
         if (targetPage) targetPage.classList.add('active');
@@ -2544,8 +2543,8 @@
             if (lottiePetunjukBody) { lottiePetunjukBody.destroy(); lottiePetunjukBody = null; }
             if (lottieMekanismeBody) { lottieMekanismeBody.destroy(); lottieMekanismeBody = null; }
             const c = document.getElementById('lottie-petunjuk-body');
-            if (c && typeof NAPAS_IDLE_DATA !== 'undefined') {
-                lottiePetunjukBody = lottie.loadAnimation({container:c, renderer:'svg', loop:true, autoplay:true, animationData:JSON.parse(JSON.stringify(NAPAS_IDLE_DATA))});
+            if (c && typeof PERNAPASAN_DATA !== 'undefined') {
+                lottiePetunjukBody = lottie.loadAnimation({container:c, renderer:'svg', loop:true, autoplay:true, animationData:JSON.parse(JSON.stringify(PERNAPASAN_DATA))});
             }
             var sliderCtrl = document.getElementById('sliderControl');
             if (sliderCtrl) sliderCtrl.classList.add('highlight');
