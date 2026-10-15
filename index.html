@@ -689,20 +689,19 @@
             object-position: bottom center;
         }
         .materi-content.with-slider {
-            gap: 1cqw;
+            gap: clamp(10px, 1.5cqw, 25px);
         }
         .materi-slider-col {
             flex: 0 0 auto;
             width: clamp(35px, 3.2cqw, 60px);
-            height: 68%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            align-self: center;
             position: relative;
             z-index: 5;
-            margin: 0 clamp(0.4cqw, 1cqw, 18px);
-            margin-bottom: 2cqh;
+            margin: 0 clamp(4px, 0.8cqw, 16px);
             transform: none;
         }
         .materi-slider-label-top, .materi-slider-label-bottom {
@@ -714,8 +713,12 @@
             font-family: 'Nunito', sans-serif;
             letter-spacing: 0.3px;
         }
-        .materi-slider-label-top { margin-bottom: 0.5cqh; }
-        .materi-slider-label-bottom { margin-top: 0.5cqh; }
+        .materi-slider-label-top {
+            margin-bottom: clamp(14px, 1.6cqh, 22px);
+        }
+        .materi-slider-label-bottom {
+            margin-top: clamp(14px, 1.6cqh, 22px);
+        }
         .materi-slider-track {
             position: relative;
             width: clamp(10px, 1.15cqw, 18px);
